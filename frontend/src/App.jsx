@@ -146,6 +146,32 @@ function StatCard({ title, value, detail }) {
   )
 }
 
+function PhotoFrame({ sources, alt, className = '', overlay, badge }) {
+  const [sourceIndex, setSourceIndex] = useState(0)
+  const currentSource = sources[sourceIndex] || sources[0]
+
+  return (
+    <article className={`photo-card ${className}`.trim()}>
+      <img
+        src={currentSource}
+        alt={alt}
+        className="photo-image"
+        onError={() => {
+          setSourceIndex((current) => Math.min(current + 1, sources.length - 1))
+        }}
+      />
+      {(overlay || badge) && (
+        <div className="photo-overlay photo-overlay-flex">
+          <div>
+            {badge && <p className="photo-badge">{badge}</p>}
+            {overlay && <p className="mt-1 text-base font-semibold text-white">{overlay}</p>}
+          </div>
+        </div>
+      )}
+    </article>
+  )
+}
+
 function VerifyResult({ data }) {
   const valid = data?.status === 'valid'
   return (
@@ -302,14 +328,46 @@ function LoginPage({ onAuth }) {
 }
 
 function LandingPage() {
-  const heroTeamPhoto = 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80'
-  const docDeskPhoto = 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1300&q=80'
-  const mobileCheckPhoto = 'https://images.unsplash.com/photo-1586880244406-556ebe35f282?auto=format&fit=crop&w=1300&q=80'
-  const meetingPhoto = 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1300&q=80'
-  const recruiterPhoto = 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1300&q=80'
-  const gradPhoto = 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1300&q=80'
-  const officePhoto = 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1300&q=80'
-  const supportPhoto = 'https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?auto=format&fit=crop&w=1300&q=80'
+  const heroTeamSources = [
+    'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80',
+    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80',
+    '/hero-doc-visual.svg',
+  ]
+  const docDeskSources = [
+    'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1300&q=80',
+    'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1300&q=80',
+    '/certificate-visual.svg',
+  ]
+  const mobileCheckSources = [
+    'https://images.unsplash.com/photo-1586880244406-556ebe35f282?auto=format&fit=crop&w=1300&q=80',
+    'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1300&q=80',
+    '/mobile-scan-visual.svg',
+  ]
+  const meetingSources = [
+    'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1300&q=80',
+    'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1300&q=80',
+    '/feature-flow.svg',
+  ]
+  const recruiterSources = [
+    'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1300&q=80',
+    'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1300&q=80',
+    '/art-09-user.svg',
+  ]
+  const gradSources = [
+    'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1300&q=80',
+    'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1300&q=80',
+    '/art-07-download.svg',
+  ]
+  const officeSources = [
+    'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1300&q=80',
+    'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1300&q=80',
+    '/feature-shield.svg',
+  ]
+  const supportSources = [
+    'https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?auto=format&fit=crop&w=1300&q=80',
+    'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=1300&q=80',
+    '/art-10-trust.svg',
+  ]
 
   return (
     <main className="landing-shell min-h-screen">
@@ -336,7 +394,7 @@ function LandingPage() {
       </header>
 
       <section className="mx-auto grid w-full max-w-6xl gap-6 px-4 pb-8 pt-10 sm:px-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="panel p-8 sm:p-10">
+        <div className="panel hero-panel p-8 sm:p-10">
           <p className="eyebrow">Professional certificate verification</p>
           <h1 className="mt-4 text-4xl font-semibold leading-tight text-slate-900 sm:text-5xl">
             Real people. Real records. Real-time proof.
@@ -535,16 +593,14 @@ function LandingPage() {
     </main>
   )
 }
-
-function CertificatePanel({ selectedDoc, verificationUrl }) {
-  const [busy, setBusy] = useState(false)
-
-  if (!selectedDoc) {
-    return (
-      <section className="panel p-6">
+          <PhotoFrame
+            sources={heroTeamSources}
+            alt="Professionals reviewing certificate records"
+            className="photo-card-lg"
+            badge="Trusted by operations teams"
+            overlay="Live credential checks before approval"
+          />
         <h3 className="section-title">Certificate Studio</h3>
-        <p className="mt-2 text-sm text-slate-600">Issue document first, then certificate preview appears here.</p>
-      </section>
     )
   }
 
