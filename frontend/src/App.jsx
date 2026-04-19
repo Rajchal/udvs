@@ -66,7 +66,40 @@ async function apiFetch(path, token, options = {}) {
   return { ok: res.ok, status: res.status, data }
 }
 
-async function downloadCertificatePdf(doc, verificationUrl, template = CERTIFICATE_TEMPLATES[0]) {
+async function loadImageAsPngDataUrl(url, width, height) {
+  const response = await fetch(url)
+  const blob = await response.blob()
+  const objectUrl = URL.createObjectURL(blob)
+
+  try {
+    const image = await new Promise((resolve, reject) => {
+      const img = new Image()
+      img.onload = () => resolve(img)
+      img.onerror = reject
+      img.src = objectUrl
+    })
+
+    const canvas = document.createElement('canvas')
+    canvas.width = width
+    canvas.height = height
+    const context = canvas.getContext('2d')
+    if (!context) {
+      throw new Error('Canvas context unavailable')
+    }
+
+    context.drawImage(image, 0, 0, width, height)
+    return canvas.toDataURL('image/png')
+  } finally {
+    URL.revokeObjectURL(objectUrl)
+  }
+}
+
+async function downloadCertificatePdf(
+  doc,
+  verificationUrl,
+  template = CERTIFICATE_TEMPLATES[0],
+  background = CERTIFICATE_BACKGROUNDS[0],
+) {
   const accentRgb = hexToRgb(template.accent)
   const accentSoftRgb = hexToRgb(template.accentSoft)
   const backgroundRgb = hexToRgb(template.background)
@@ -80,6 +113,20 @@ async function downloadCertificatePdf(doc, verificationUrl, template = CERTIFICA
 
   pdf.setFillColor(backgroundRgb.r, backgroundRgb.g, backgroundRgb.b)
   pdf.rect(0, 0, 842, 595, 'F')
+
+  if (background?.asset) {
+    try {
+      const backgroundDataUrl = await loadImageAsPngDataUrl(background.asset, 770, 523)
+      pdf.addImage(backgroundDataUrl, 'PNG', 36, 36, 770, 523)
+    } catch {
+      // If the background image fails, continue with solid template color.
+    }
+  }
+
+  pdf.setFillColor(255, 255, 255)
+  pdf.setGState(new pdf.GState({ opacity: 0.84 }))
+  pdf.roundedRect(44, 88, 754, 463, 10, 10, 'F')
+  pdf.setGState(new pdf.GState({ opacity: 1 }))
 
   pdf.setDrawColor(accentSoftRgb.r, accentSoftRgb.g, accentSoftRgb.b)
   pdf.setLineWidth(2)
@@ -218,6 +265,33 @@ const CERTIFICATE_TEMPLATES = [
     accentSoft: '#e9d8b3',
     background: '#fffdf8',
     header: 'OFFICIAL VERIFICATION CERTIFICATE',
+  },
+]
+
+const CERTIFICATE_BACKGROUNDS = [
+  {
+    id: 'royal',
+    name: 'Royal Wash',
+    note: 'Cool geometric layers',
+    asset: '/certificate-bg-royal.svg',
+  },
+  {
+    id: 'marble',
+    name: 'Marble Gold',
+    note: 'Warm elegant texture',
+    asset: '/certificate-bg-marble.svg',
+  },
+  {
+    id: 'grid',
+    name: 'Aqua Grid',
+    note: 'Structured modern lines',
+    asset: '/certificate-bg-grid.svg',
+  },
+  {
+    id: 'ink',
+    name: 'Ink Flow',
+    note: 'Soft abstract motion',
+    asset: '/certificate-bg-ink.svg',
   },
 ]
 
@@ -799,7 +873,9 @@ function LandingPage() {
 function CertificatePanel({ selectedDoc, verificationUrl, notify }) {
   const [busy, setBusy] = useState(false)
   const [templateId, setTemplateId] = useState(CERTIFICATE_TEMPLATES[0].id)
+  const [backgroundId, setBackgroundId] = useState(CERTIFICATE_BACKGROUNDS[0].id)
   const selectedTemplate = CERTIFICATE_TEMPLATES.find((template) => template.id === templateId) || CERTIFICATE_TEMPLATES[0]
+  const selectedBackground = CERTIFICATE_BACKGROUNDS.find((background) => background.id === backgroundId) || CERTIFICATE_BACKGROUNDS[0]
 
   if (!selectedDoc) {
     return (
@@ -812,7 +888,7 @@ function CertificatePanel({ selectedDoc, verificationUrl, notify }) {
 
   const onPdf = async () => {
     setBusy(true)
-    await downloadCertificatePdf(selectedDoc, verificationUrl, selectedTemplate)
+    await downloadCertificatePdf(selectedDoc, verificationUrl, selectedTemplate, selectedBackground)
     setBusy(false)
     notify('Certificate PDF downloaded.', 'success')
   }
@@ -854,8 +930,35 @@ function CertificatePanel({ selectedDoc, verificationUrl, notify }) {
         ))}
       </div>
 
+      <div className="mb-5">
+        <p className="mb-2 text-sm font-semibold text-slate-700">Background image packs</p>
+        <div className="grid gap-3 md:grid-cols-4">
+          {CERTIFICATE_BACKGROUNDS.map((background) => (
+            <button
+              key={background.id}
+              type="button"
+              className={`background-card ${backgroundId === background.id ? 'background-card-active' : ''}`}
+              onClick={() => setBackgroundId(background.id)}
+            >
+              <img src={background.asset} alt={`${background.name} background`} className="background-thumb" />
+              <span className="template-card-body">
+                <span className="template-card-title">{background.name}</span>
+                <span className="template-card-note">{background.note}</span>
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       <article className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-        <div className="certificate-surface">
+        <div
+          className="certificate-surface"
+          style={{
+            backgroundImage: `linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.9)), url(${selectedBackground.asset})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
           <p className="eyebrow">Certificate of Verification</p>
           <h4 className="mt-2 text-3xl font-semibold text-slate-900">{selectedDoc.recipient_name}</h4>
           <p className="mt-3 text-slate-600">
@@ -1296,7 +1399,7 @@ function DashboardPage({ auth, onLogout, notify }) {
           <section className="panel p-6">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="section-title">Organization Documents</h2>
-                <button type="button" className="btn-secondary" onClick={async () => { await loadDocuments(); notify('Documents refreshed.', 'success') }}>Refresh</button>
+              <button type="button" className="btn-secondary" onClick={async () => { await loadDocuments(); notify('Documents refreshed.', 'success') }}>Refresh</button>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[760px] text-left text-sm">

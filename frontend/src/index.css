@@ -329,6 +329,38 @@ body {
   color: #64748b;
 }
 
+.background-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  border: 1px solid rgba(99, 91, 142, 0.14);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.7rem;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.background-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(99, 91, 142, 0.28);
+  box-shadow: 0 12px 24px rgba(35, 24, 82, 0.08);
+}
+
+.background-card-active {
+  border-color: rgba(99, 91, 142, 0.4);
+  box-shadow: 0 14px 24px rgba(35, 24, 82, 0.1);
+}
+
+.background-thumb {
+  width: 100%;
+  height: 92px;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(99, 91, 142, 0.14);
+  object-fit: cover;
+}
+
 .nav-link-icon,
 .btn-icon,
 .chip-icon,
