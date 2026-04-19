@@ -1,0 +1,119 @@
+@import 'tailwindcss';
+
+:root {
+  font-family: 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #f2f5f8;
+  color: #0f172a;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.panel {
+  border: 1px solid #dce3ea;
+  border-radius: 1rem;
+  background: #ffffff;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #64748b;
+}
+
+.field {
+  width: 100%;
+  border-radius: 0.8rem;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  padding: 0.65rem 0.8rem;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.field:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.16);
+}
+
+.btn {
+  border: 0;
+  border-radius: 0.8rem;
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 0.65rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 140ms ease;
+}
+
+.btn:hover {
+  background: #1e293b;
+}
+
+.btn-secondary {
+  border: 1px solid #cbd5e1;
+  border-radius: 0.75rem;
+  background: #ffffff;
+  color: #0f172a;
+  padding: 0.5rem 0.8rem;
+  cursor: pointer;
+}
+
+.btn-link {
+  border: 0;
+  background: transparent;
+  color: #2563eb;
+  text-decoration: underline;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.tab-button {
+  flex: 1;
+  border: 0;
+  border-radius: 0.7rem;
+  background: transparent;
+  color: #475569;
+  padding: 0.5rem 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tab-active {
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.1);
+}
+
+.nav-item {
+  width: 100%;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.7rem;
+  background: #f8fafc;
+  color: #334155;
+  text-align: left;
+  padding: 0.6rem 0.7rem;
+  cursor: pointer;
+}
+
+.nav-item-active {
+  border-color: #93c5fd;
+  background: #eff6ff;
+  color: #1e3a8a;
+}
