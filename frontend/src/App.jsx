@@ -66,26 +66,32 @@ async function apiFetch(path, token, options = {}) {
   return { ok: res.ok, status: res.status, data }
 }
 
-async function downloadCertificatePdf(doc, verificationUrl) {
+async function downloadCertificatePdf(doc, verificationUrl, template = CERTIFICATE_TEMPLATES[0]) {
+  const accentRgb = hexToRgb(template.accent)
+  const accentSoftRgb = hexToRgb(template.accentSoft)
+  const backgroundRgb = hexToRgb(template.background)
   const qrDataUrl = await QRCode.toDataURL(verificationUrl, {
     width: 240,
     margin: 1,
-    color: { dark: '#0f172a', light: '#ffffff' },
+    color: { dark: template.accent, light: '#ffffff' },
   })
 
   const pdf = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' })
 
-  pdf.setFillColor(255, 255, 255)
+  pdf.setFillColor(backgroundRgb.r, backgroundRgb.g, backgroundRgb.b)
   pdf.rect(0, 0, 842, 595, 'F')
 
-  pdf.setDrawColor(203, 213, 225)
+  pdf.setDrawColor(accentSoftRgb.r, accentSoftRgb.g, accentSoftRgb.b)
   pdf.setLineWidth(2)
   pdf.roundedRect(36, 36, 770, 523, 10, 10)
 
+  pdf.setFillColor(accentRgb.r, accentRgb.g, accentRgb.b)
+  pdf.roundedRect(36, 36, 770, 46, 10, 10, 'F')
+
   pdf.setFont('helvetica', 'bold')
   pdf.setFontSize(14)
-  pdf.setTextColor(71, 85, 105)
-  pdf.text('UNIVERSAL DOCUMENT VERIFICATION SYSTEM', 58, 74)
+  pdf.setTextColor(255, 255, 255)
+  pdf.text(template.header, 58, 64)
 
   pdf.setFontSize(34)
   pdf.setTextColor(15, 23, 42)
@@ -185,6 +191,64 @@ function InlineIcon({ icon, className = '' }) {
   return <Icon icon={icon} className={className} aria-hidden="true" />
 }
 
+const CERTIFICATE_TEMPLATES = [
+  {
+    id: 'classic',
+    name: 'Classic Slate',
+    note: 'Minimal and formal',
+    accent: '#475569',
+    accentSoft: '#cbd5e1',
+    background: '#ffffff',
+    header: 'UNIVERSAL DOCUMENT VERIFICATION SYSTEM',
+  },
+  {
+    id: 'midnight',
+    name: 'Midnight Blue',
+    note: 'Premium dark frame',
+    accent: '#334155',
+    accentSoft: '#94a3b8',
+    background: '#f8fafc',
+    header: 'UBDVS CERTIFICATE',
+  },
+  {
+    id: 'linen',
+    name: 'Linen Gold',
+    note: 'Soft warm contrast',
+    accent: '#8c6d3b',
+    accentSoft: '#e9d8b3',
+    background: '#fffdf8',
+    header: 'OFFICIAL VERIFICATION CERTIFICATE',
+  },
+]
+
+function hexToRgb(hex) {
+  const raw = hex.replace('#', '')
+  const normalized = raw.length === 3 ? raw.split('').map((part) => part + part).join('') : raw
+  return {
+    r: Number.parseInt(normalized.slice(0, 2), 16),
+    g: Number.parseInt(normalized.slice(2, 4), 16),
+    b: Number.parseInt(normalized.slice(4, 6), 16),
+  }
+}
+
+function ToastStack({ toasts, onDismiss }) {
+  return (
+    <div className="toast-stack" aria-live="polite" aria-atomic="true">
+      {toasts.map((toast) => (
+        <div key={toast.id} className={`toast toast-${toast.tone}`}>
+          <div>
+            <p className="toast-title">{toast.title}</p>
+            <p className="toast-copy">{toast.message}</p>
+          </div>
+          <button type="button" className="toast-dismiss" onClick={() => onDismiss(toast.id)} aria-label="Dismiss toast">
+            <Icon icon="mdi:close" width="16" height="16" />
+          </button>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function VerifyResult({ data }) {
   const valid = data?.status === 'valid'
   return (
@@ -224,7 +288,7 @@ function VerifyResult({ data }) {
   )
 }
 
-function LoginPage({ onAuth }) {
+function LoginPage({ onAuth, notify }) {
   const navigate = useNavigate()
   const [mode, setMode] = useState('login')
   const [organizationName, setOrganizationName] = useState('')
@@ -260,10 +324,12 @@ function LoginPage({ onAuth }) {
 
     if (!ok) {
       setError(data.error || 'Authentication failed')
+      notify(data.error || 'Authentication failed', 'error')
       return
     }
 
     onAuth({ token: data.token, user: data.user })
+    notify(mode === 'login' ? 'Signed in successfully.' : 'Organization account created.', 'success')
     navigate('/dashboard')
   }
 
@@ -315,7 +381,7 @@ function LoginPage({ onAuth }) {
           </div>
 
           <div className="mt-6 rounded-2xl border border-slate-200 bg-white/80 p-4 text-sm text-slate-600 shadow-sm">
-            Demo: admin@acme.edu / admin123
+            Use your organization account from the README, or create a new one here.
           </div>
         </div>
 
@@ -394,8 +460,8 @@ function LoginPage({ onAuth }) {
 
 function LandingPage() {
   const heroTeamSources = [
-    'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80',
     'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80',
+    'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80',
     '/hero-doc-visual.svg',
   ]
   const docDeskSources = [
@@ -415,17 +481,17 @@ function LandingPage() {
   ]
   const recruiterSources = [
     'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1300&q=80',
-    'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1300&q=80',
+    'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1300&q=80',
     '/art-09-user.svg',
   ]
   const gradSources = [
     'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1300&q=80',
-    'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1300&q=80',
+    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=1300&q=80',
     '/art-07-download.svg',
   ]
   const officeSources = [
-    'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1300&q=80',
     'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1300&q=80',
+    'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1300&q=80',
     '/feature-shield.svg',
   ]
   const supportSources = [
@@ -627,6 +693,59 @@ function LandingPage() {
             overlay="Issue, track, and verify in one interface"
           />
         </div>
+
+        <div className="mt-4 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+          <PhotoFrame
+            sources={[
+              'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1300&q=80',
+              'https://images.unsplash.com/photo-1526948128573-703ee1aeb6fa?auto=format&fit=crop&w=1300&q=80',
+              '/art-03-mobile.svg',
+            ]}
+            alt="Team handling digital documents"
+            badge="Document desk"
+            overlay="Clean workflows for digital paperwork"
+          />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <PhotoFrame
+              sources={[
+                'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=80',
+                'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80',
+                '/art-01-seal.svg',
+              ]}
+              alt="Professionals in a review meeting"
+              badge="Review"
+              overlay="Clear approvals for verification teams"
+            />
+            <PhotoFrame
+              sources={[
+                'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80',
+                'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80',
+                '/art-10-trust.svg',
+              ]}
+              alt="People discussing documents on a laptop"
+              badge="Trust"
+              overlay="Fast decisions backed by proof"
+            />
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <article className="panel p-6">
+            <p className="eyebrow">Speed</p>
+            <h3 className="mt-2 text-lg font-semibold text-slate-900">Less clutter, more action</h3>
+            <p className="mt-2 text-sm text-slate-600">A cleaner landing focuses on verification, not noise.</p>
+          </article>
+          <article className="panel p-6">
+            <p className="eyebrow">Trust</p>
+            <h3 className="mt-2 text-lg font-semibold text-slate-900">Real people, real process</h3>
+            <p className="mt-2 text-sm text-slate-600">Use imagery that looks like actual operations teams and documents.</p>
+          </article>
+          <article className="panel p-6">
+            <p className="eyebrow">Clarity</p>
+            <h3 className="mt-2 text-lg font-semibold text-slate-900">No repeated art</h3>
+            <p className="mt-2 text-sm text-slate-600">Every block uses a different visual so the page feels intentional.</p>
+          </article>
+        </div>
       </section>
 
       <section id="use-cases" className="mx-auto w-full max-w-6xl px-4 pb-12 sm:px-6">
@@ -677,8 +796,10 @@ function LandingPage() {
   )
 }
 
-function CertificatePanel({ selectedDoc, verificationUrl }) {
+function CertificatePanel({ selectedDoc, verificationUrl, notify }) {
   const [busy, setBusy] = useState(false)
+  const [templateId, setTemplateId] = useState(CERTIFICATE_TEMPLATES[0].id)
+  const selectedTemplate = CERTIFICATE_TEMPLATES.find((template) => template.id === templateId) || CERTIFICATE_TEMPLATES[0]
 
   if (!selectedDoc) {
     return (
@@ -691,24 +812,46 @@ function CertificatePanel({ selectedDoc, verificationUrl }) {
 
   const onPdf = async () => {
     setBusy(true)
-    await downloadCertificatePdf(selectedDoc, verificationUrl)
+    await downloadCertificatePdf(selectedDoc, verificationUrl, selectedTemplate)
     setBusy(false)
+    notify('Certificate PDF downloaded.', 'success')
   }
 
   const onQr = async () => {
     await downloadQrImage(selectedDoc.id, verificationUrl)
+    notify('QR image downloaded.', 'success')
   }
 
   return (
     <section className="panel p-6">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="section-title">Certificate Studio</h3>
+        <div>
+          <h3 className="section-title">Certificate Studio</h3>
+          <p className="mt-1 text-sm text-slate-600">Choose a template before downloading the PDF.</p>
+        </div>
         <div className="flex gap-2">
           <button type="button" className="btn-secondary" onClick={onQr}>Download QR</button>
           <button type="button" className="btn" onClick={onPdf} disabled={busy}>
             {busy ? 'Generating PDF...' : 'Download Certificate PDF'}
           </button>
         </div>
+      </div>
+
+      <div className="mb-5 grid gap-3 md:grid-cols-3">
+        {CERTIFICATE_TEMPLATES.map((template) => (
+          <button
+            key={template.id}
+            type="button"
+            className={`template-card ${templateId === template.id ? 'template-card-active' : ''}`}
+            onClick={() => setTemplateId(template.id)}
+          >
+            <span className="template-swatch" style={{ background: template.accent }} />
+            <span className="template-card-body">
+              <span className="template-card-title">{template.name}</span>
+              <span className="template-card-note">{template.note}</span>
+            </span>
+          </button>
+        ))}
       </div>
 
       <article className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
@@ -748,7 +891,7 @@ function CertificatePanel({ selectedDoc, verificationUrl }) {
   )
 }
 
-function DashboardPage({ auth, onLogout }) {
+function DashboardPage({ auth, onLogout, notify }) {
   const token = auth.token
   const [form, setForm] = useState(EMPTY_FORM)
   const [issueError, setIssueError] = useState('')
@@ -761,6 +904,7 @@ function DashboardPage({ auth, onLogout }) {
   const [verifyError, setVerifyError] = useState('')
   const [selectedDocId, setSelectedDocId] = useState('')
   const [publicVerifyBaseUrl, setPublicVerifyBaseUrl] = useState(readPublicVerifyBaseUrl)
+  const [publicVerifyBaseUrlDraft, setPublicVerifyBaseUrlDraft] = useState(readPublicVerifyBaseUrl)
 
   const selectedDoc = useMemo(
     () => documents.find((doc) => doc.id === selectedDocId) || documents[0] || null,
@@ -772,15 +916,21 @@ function DashboardPage({ auth, onLogout }) {
     return buildVerificationUrl(selectedDoc.id, publicVerifyBaseUrl)
   }, [selectedDoc, publicVerifyBaseUrl])
 
-  useEffect(() => {
-    const normalized = normalizeBaseUrl(publicVerifyBaseUrl)
-    if (!normalized) return
+  const confirmPublicVerifyBaseUrl = () => {
+    const normalized = normalizeBaseUrl(publicVerifyBaseUrlDraft)
+    if (!normalized) {
+      notify('Enter a public verification URL first.', 'error')
+      return
+    }
+
+    setPublicVerifyBaseUrl(normalized)
     try {
       localStorage.setItem(PUBLIC_VERIFY_BASE_KEY, normalized)
     } catch {
       // ignore storage errors and keep in-memory value
     }
-  }, [publicVerifyBaseUrl])
+    notify('Public verification URL saved.', 'success')
+  }
 
   const loadDocuments = async () => {
     const { ok, data } = await apiFetch('/api/documents', token)
@@ -841,6 +991,7 @@ function DashboardPage({ auth, onLogout }) {
 
     if (!ok) {
       setIssueError(data.error || 'Failed to issue document.')
+      notify(data.error || 'Failed to issue document.', 'error')
       return
     }
 
@@ -849,6 +1000,7 @@ function DashboardPage({ auth, onLogout }) {
     setSelectedDocId(data.document_id)
     await loadDocuments()
     await loadLogs()
+    notify('Certificate issued successfully.', 'success')
   }
 
   const handleVerify = async (e) => {
@@ -859,6 +1011,7 @@ function DashboardPage({ auth, onLogout }) {
     const id = verifyId.trim()
     if (!id) {
       setVerifyError('Enter document ID.')
+      notify('Enter document ID.', 'error')
       return
     }
 
@@ -866,10 +1019,12 @@ function DashboardPage({ auth, onLogout }) {
 
     if (!ok) {
       setVerifyError(data.error || 'Document not found.')
+      notify(data.error || 'Document not found.', 'error')
       return
     }
 
     setVerifyResult(data)
+    notify(`Verification ${data.status}.`, data.status === 'valid' ? 'success' : 'error')
   }
 
   const panels = [
@@ -890,7 +1045,7 @@ function DashboardPage({ auth, onLogout }) {
         </div>
         <div className="flex items-center gap-2">
           <Link to="/scan" className="btn-secondary"><InlineIcon icon="mdi:qrcode-scan" className="btn-icon" />Mobile Scanner</Link>
-          <button type="button" className="btn-secondary" onClick={onLogout}><InlineIcon icon="mdi:logout-variant" className="btn-icon" />Sign out</button>
+          <button type="button" className="btn-secondary" onClick={() => { onLogout(); notify('Signed out.', 'info') }}><InlineIcon icon="mdi:logout-variant" className="btn-icon" />Sign out</button>
         </div>
       </div>
 
@@ -1030,8 +1185,8 @@ function DashboardPage({ auth, onLogout }) {
                   <input
                     className="field mt-2"
                     placeholder="https://your-domain.com"
-                    value={publicVerifyBaseUrl}
-                    onChange={(e) => setPublicVerifyBaseUrl(e.target.value)}
+                    value={publicVerifyBaseUrlDraft}
+                    onChange={(e) => setPublicVerifyBaseUrlDraft(e.target.value)}
                   />
                   <p className="mt-2 text-xs text-slate-600">
                     If your laptop uses localhost, set this to your LAN IP origin like
@@ -1040,13 +1195,17 @@ function DashboardPage({ auth, onLogout }) {
                     {' '}
                     so phone-scanned QR links open correctly.
                   </p>
-                  <button
-                    type="button"
-                    className="btn-link mt-2"
-                    onClick={() => setPublicVerifyBaseUrl(window.location.origin)}
-                  >
-                    Reset to current origin
-                  </button>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button type="button" className="btn-secondary" onClick={() => setPublicVerifyBaseUrlDraft(window.location.origin)}>
+                      Use current origin
+                    </button>
+                    <button type="button" className="btn" onClick={confirmPublicVerifyBaseUrl}>
+                      Confirm URL
+                    </button>
+                  </div>
+                  <p className="mt-2 text-xs text-slate-500">
+                    Saved URL: <span className="font-mono">{publicVerifyBaseUrl || 'not set yet'}</span>
+                  </p>
                 </div>
               </section>
               <div className="grid gap-4 md:grid-cols-3">
@@ -1054,7 +1213,7 @@ function DashboardPage({ auth, onLogout }) {
                 <div className="visual-card"><img src="/art-06-qr.svg" alt="QR illustration" className="art-image" /></div>
                 <div className="visual-card"><img src="/art-07-download.svg" alt="Download illustration" className="art-image" /></div>
               </div>
-              <CertificatePanel selectedDoc={selectedDoc} verificationUrl={selectedVerificationUrl} />
+              <CertificatePanel selectedDoc={selectedDoc} verificationUrl={selectedVerificationUrl} notify={notify} />
             </>
           )}
 
@@ -1091,7 +1250,7 @@ function DashboardPage({ auth, onLogout }) {
             <section className="panel p-6">
               <div className="mb-3 flex items-center justify-between">
                 <h2 className="section-title">Audit Logs</h2>
-                <button type="button" className="btn-secondary" onClick={loadLogs}>Refresh</button>
+                <button type="button" className="btn-secondary" onClick={async () => { await loadLogs(); notify('Audit logs refreshed.', 'success') }}>Refresh</button>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[680px] text-left text-sm">
@@ -1137,7 +1296,7 @@ function DashboardPage({ auth, onLogout }) {
           <section className="panel p-6">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="section-title">Organization Documents</h2>
-              <button type="button" className="btn-secondary" onClick={loadDocuments}>Refresh</button>
+                <button type="button" className="btn-secondary" onClick={async () => { await loadDocuments(); notify('Documents refreshed.', 'success') }}>Refresh</button>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[760px] text-left text-sm">
@@ -1174,7 +1333,7 @@ function DashboardPage({ auth, onLogout }) {
   )
 }
 
-function VerifyPage() {
+function VerifyPage({ notify }) {
   const { id } = useParams()
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
@@ -1184,9 +1343,11 @@ function VerifyPage() {
       const { ok, data } = await apiFetch(`/api/verify/${id}`, '')
       if (!ok) {
         setError(data.error || 'Document not found.')
+        notify(data.error || 'Document not found.', 'error')
         return
       }
       setResult(data)
+      notify('Public verification loaded.', 'success')
     }
 
     run()
@@ -1216,7 +1377,7 @@ function VerifyPage() {
   )
 }
 
-function MobileScannerPage() {
+function MobileScannerPage({ notify }) {
   const [decoded, setDecoded] = useState('')
   const [notice, setNotice] = useState('Camera opens when permission granted. Best on mobile browser.')
   const scannerRef = useRef(null)
@@ -1236,6 +1397,7 @@ function MobileScannerPage() {
       (decodedText) => {
         setDecoded(decodedText)
         setNotice('QR detected. Redirecting if it matches verification URL...')
+        notify('QR code detected.', 'info')
 
         let targetId = ''
         try {
@@ -1253,6 +1415,8 @@ function MobileScannerPage() {
 
         if (targetId) {
           navigate(`/verify/${targetId}`)
+        } else {
+          notify('QR detected but no verification link found.', 'error')
         }
       },
       () => { },
@@ -1312,6 +1476,24 @@ function ProtectedRoute({ auth, children }) {
 
 function App() {
   const [auth, setAuth] = useState(readStoredAuth)
+  const [toasts, setToasts] = useState([])
+
+  const notify = (message, tone = 'info') => {
+    const id = `${Date.now()}-${Math.random().toString(16).slice(2)}`
+    const titleMap = {
+      success: 'Success',
+      error: 'Error',
+      info: 'Update',
+    }
+    setToasts((current) => [...current, { id, title: titleMap[tone] || 'Update', message, tone }])
+    window.setTimeout(() => {
+      setToasts((current) => current.filter((toast) => toast.id !== id))
+    }, 3400)
+  }
+
+  const dismissToast = (id) => {
+    setToasts((current) => current.filter((toast) => toast.id !== id))
+  }
 
   useEffect(() => {
     if (!auth.token) return
@@ -1337,19 +1519,20 @@ function App() {
 
   return (
     <BrowserRouter>
+      <ToastStack toasts={toasts} onDismiss={dismissToast} />
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={auth.token ? <Navigate to="/dashboard" replace /> : <LoginPage onAuth={handleAuth} />} />
+        <Route path="/login" element={auth.token ? <Navigate to="/dashboard" replace /> : <LoginPage onAuth={handleAuth} notify={notify} />} />
         <Route
           path="/dashboard"
           element={
             <ProtectedRoute auth={auth}>
-              <DashboardPage auth={auth} onLogout={logout} />
+              <DashboardPage auth={auth} onLogout={logout} notify={notify} />
             </ProtectedRoute>
           }
         />
-        <Route path="/scan" element={<MobileScannerPage />} />
-        <Route path="/verify/:id" element={<VerifyPage />} />
+        <Route path="/scan" element={<MobileScannerPage notify={notify} />} />
+        <Route path="/verify/:id" element={<VerifyPage notify={notify} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

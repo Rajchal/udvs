@@ -45,6 +45,18 @@ npm run dev
 Frontend runs on `http://127.0.0.1:5173`.
 Vite proxy forwards `/api/*` to Flask.
 
+## Hotspot / Mobile Verification
+
+If you are using a laptop hotspot and scanning from a phone, open the app from the laptop LAN IP, not `localhost`.
+
+Example:
+
+```text
+http://192.168.43.1:5173
+```
+
+In the dashboard, open `Certificate Studio`, type that URL into the public verification base URL field, and press `Confirm URL` before generating a QR code.
+
 ## Main API
 
 - `POST /api/auth/register` create org account
@@ -67,6 +79,7 @@ Vite proxy forwards `/api/*` to Flask.
 
 - Email: `admin@acme.edu`
 - Password: `admin123`
+- These demo credentials are for local development only.
 
 ## Notes
 
