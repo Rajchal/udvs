@@ -1,6 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { jsPDF } from 'jspdf'
+import { Html5QrcodeScanner } from 'html5-qrcode'
+import QRCode from 'qrcode'
 import { QRCodeCanvas } from 'qrcode.react'
-import { BrowserRouter, Link, Navigate, Route, Routes, useParams } from 'react-router-dom'
+import { BrowserRouter, Link, Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom'
 
 const EMPTY_FORM = {
   recipient_name: '',
@@ -40,6 +43,77 @@ async function apiFetch(path, token, options = {}) {
   return { ok: res.ok, status: res.status, data }
 }
 
+async function downloadCertificatePdf(doc, verificationUrl) {
+  const qrDataUrl = await QRCode.toDataURL(verificationUrl, {
+    width: 240,
+    margin: 1,
+    color: { dark: '#0f172a', light: '#ffffff' },
+  })
+
+  const pdf = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' })
+
+  pdf.setFillColor(255, 255, 255)
+  pdf.rect(0, 0, 842, 595, 'F')
+
+  pdf.setDrawColor(203, 213, 225)
+  pdf.setLineWidth(2)
+  pdf.roundedRect(36, 36, 770, 523, 10, 10)
+
+  pdf.setFont('helvetica', 'bold')
+  pdf.setFontSize(14)
+  pdf.setTextColor(71, 85, 105)
+  pdf.text('UNIVERSAL DOCUMENT VERIFICATION SYSTEM', 58, 74)
+
+  pdf.setFontSize(34)
+  pdf.setTextColor(15, 23, 42)
+  pdf.text('Certificate of Verification', 58, 132)
+
+  pdf.setFont('helvetica', 'normal')
+  pdf.setFontSize(16)
+  pdf.setTextColor(51, 65, 85)
+  pdf.text('This certifies that the following record was issued by authorized organization.', 58, 170)
+
+  pdf.setFont('helvetica', 'bold')
+  pdf.setFontSize(29)
+  pdf.setTextColor(15, 23, 42)
+  pdf.text(doc.recipient_name, 58, 232)
+
+  pdf.setFont('helvetica', 'normal')
+  pdf.setFontSize(15)
+  pdf.setTextColor(30, 41, 59)
+  pdf.text(`Document: ${doc.document_name}`, 58, 274)
+  pdf.text(`Type: ${doc.document_type}`, 58, 304)
+  pdf.text(`Issued by: ${doc.organization_name}`, 58, 334)
+  pdf.text(`Issue date: ${doc.issue_date}`, 58, 364)
+
+  pdf.setFont('courier', 'normal')
+  pdf.setFontSize(11)
+  pdf.setTextColor(71, 85, 105)
+  pdf.text(`Document ID: ${doc.id}`, 58, 420)
+  pdf.text(`Hash: ${doc.hash}`, 58, 442)
+
+  pdf.setFont('helvetica', 'normal')
+  pdf.setFontSize(11)
+  pdf.setTextColor(100, 116, 139)
+  pdf.text('Scan QR code to open public verification page.', 572, 418)
+  pdf.addImage(qrDataUrl, 'PNG', 588, 236, 168, 168)
+
+  pdf.save(`${doc.id}-certificate.pdf`)
+}
+
+async function downloadQrImage(docId, verificationUrl) {
+  const dataUrl = await QRCode.toDataURL(verificationUrl, {
+    width: 500,
+    margin: 1,
+    color: { dark: '#0f172a', light: '#ffffff' },
+  })
+
+  const link = document.createElement('a')
+  link.href = dataUrl
+  link.download = `${docId}-verification-qr.png`
+  link.click()
+}
+
 function StatCard({ title, value, detail }) {
   return (
     <article className="panel p-5">
@@ -57,8 +131,9 @@ function VerifyResult({ data }) {
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-xl font-semibold text-slate-900">Verification Result</h3>
         <span
-          className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] ${valid ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
-            }`}
+          className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] ${
+            valid ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
+          }`}
         >
           {valid ? 'Valid' : 'Invalid'}
         </span>
@@ -113,7 +188,7 @@ function LoginPage({ onAuth }) {
     })
 
     if (!ok) {
-      setError(data.error || 'Auth failed')
+      setError(data.error || 'Authentication failed')
       return
     }
 
@@ -122,23 +197,41 @@ function LoginPage({ onAuth }) {
 
   return (
     <main className="min-h-screen p-4 sm:p-8">
-      <section className="mx-auto grid w-full max-w-5xl gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="panel p-8">
-          <p className="eyebrow">Universal Document Verification</p>
-          <h1 className="mt-3 text-4xl font-semibold text-slate-900">Certificate Management Platform</h1>
-          <p className="mt-4 max-w-xl text-slate-600">
-            Enterprise style issuer console with public verification. Smooth colors, clean structure, no chain layer.
-          </p>
-          <div className="mt-8 grid gap-3 sm:grid-cols-2">
-            <StatCard title="Issuer Access" value="Role Based" detail="Organization login required" />
-            <StatCard title="Verification" value="Public + API" detail="ID or hash checks" />
-            <StatCard title="Document Proof" value="SHA-256" detail="Tamper detection" />
-            <StatCard title="Demo User" value="admin@acme.edu" detail="Password: admin123" />
+      <section className="mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+        <div className="panel p-8 sm:p-10">
+          <div className="flex items-center gap-2">
+            <span className="brand-dot" />
+            <p className="eyebrow">Universal Blockchain Document Verification System</p>
           </div>
+          <h1 className="mt-4 text-4xl font-semibold leading-tight text-slate-900 sm:text-5xl">
+            Global-grade Certificate Verification Experience
+          </h1>
+          <p className="mt-5 max-w-2xl text-slate-600">
+            Automated issuance, QR verification, mobile scanning, and downloadable certificates in one platform.
+          </p>
+
+          <div className="mt-7 flex flex-wrap gap-2">
+            <span className="logo-chip">Acme University</span>
+            <span className="logo-chip">Gov Cert Board</span>
+            <span className="logo-chip">Prime Skills Council</span>
+            <span className="logo-chip">National Registry</span>
+          </div>
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            <StatCard title="Fraud Blocking" value="Hash Protected" detail="Tamper checks on every verification" />
+            <StatCard title="Channels" value="Web + Mobile" detail="Scan QR from phone to verify instantly" />
+            <StatCard title="Automation" value="Instant Issuance" detail="Generate ID, hash, and QR in one action" />
+            <StatCard title="Demo Access" value="Ready" detail="admin@acme.edu / admin123" />
+          </div>
+
+          <Link to="/scan" className="btn-secondary mt-6 inline-flex">Open Mobile Scanner</Link>
         </div>
 
-        <form onSubmit={submit} className="panel p-7">
-          <div className="mb-4 flex rounded-xl bg-slate-100 p-1">
+        <form onSubmit={submit} className="panel p-7 sm:p-8">
+          <p className="eyebrow">Issuer Access</p>
+          <h2 className="mt-2 text-3xl font-semibold text-slate-900">Sign in to Platform</h2>
+
+          <div className="mt-5 flex rounded-xl bg-slate-100 p-1">
             <button
               type="button"
               className={`tab-button ${mode === 'login' ? 'tab-active' : ''}`}
@@ -151,21 +244,21 @@ function LoginPage({ onAuth }) {
               className={`tab-button ${mode === 'register' ? 'tab-active' : ''}`}
               onClick={() => setMode('register')}
             >
-              Register Org
+              Register
             </button>
           </div>
 
           {mode === 'register' && (
             <input
               required
-              className="field"
+              className="field mt-4"
               placeholder="Organization name"
               value={organizationName}
               onChange={(e) => setOrganizationName(e.target.value)}
             />
           )}
 
-          <div className="mt-3 grid gap-3">
+          <div className="mt-4 grid gap-3">
             <input
               required
               className="field"
@@ -184,10 +277,76 @@ function LoginPage({ onAuth }) {
           </div>
 
           {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
-          <button type="submit" className="btn mt-4 w-full">{mode === 'login' ? 'Sign In' : 'Create Account'}</button>
+          <button type="submit" className="btn mt-5 w-full">{mode === 'login' ? 'Sign In' : 'Create Organization'}</button>
         </form>
       </section>
     </main>
+  )
+}
+
+function CertificatePanel({ selectedDoc, verificationUrl }) {
+  const [busy, setBusy] = useState(false)
+
+  if (!selectedDoc) {
+    return (
+      <section className="panel p-6">
+        <h3 className="section-title">Certificate Studio</h3>
+        <p className="mt-2 text-sm text-slate-600">Issue document first, then certificate preview appears here.</p>
+      </section>
+    )
+  }
+
+  const onPdf = async () => {
+    setBusy(true)
+    await downloadCertificatePdf(selectedDoc, verificationUrl)
+    setBusy(false)
+  }
+
+  const onQr = async () => {
+    await downloadQrImage(selectedDoc.id, verificationUrl)
+  }
+
+  return (
+    <section className="panel p-6">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <h3 className="section-title">Certificate Studio</h3>
+        <div className="flex gap-2">
+          <button type="button" className="btn-secondary" onClick={onQr}>Download QR</button>
+          <button type="button" className="btn" onClick={onPdf} disabled={busy}>
+            {busy ? 'Generating PDF...' : 'Download Certificate PDF'}
+          </button>
+        </div>
+      </div>
+
+      <article className="certificate-surface">
+        <p className="eyebrow">Certificate of Verification</p>
+        <h4 className="mt-2 text-3xl font-semibold text-slate-900">{selectedDoc.recipient_name}</h4>
+        <p className="mt-3 text-slate-600">
+          {selectedDoc.document_name} issued by {selectedDoc.organization_name}
+        </p>
+        <dl className="mt-6 grid gap-2 text-sm text-slate-700 sm:grid-cols-2">
+          <div>
+            <dt className="text-slate-500">Document ID</dt>
+            <dd className="font-mono text-xs">{selectedDoc.id}</dd>
+          </div>
+          <div>
+            <dt className="text-slate-500">Type</dt>
+            <dd>{selectedDoc.document_type}</dd>
+          </div>
+          <div>
+            <dt className="text-slate-500">Issue Date</dt>
+            <dd>{selectedDoc.issue_date}</dd>
+          </div>
+          <div>
+            <dt className="text-slate-500">Hash</dt>
+            <dd className="font-mono text-xs break-all">{selectedDoc.hash}</dd>
+          </div>
+        </dl>
+        <div className="mt-6 inline-block rounded-md border border-slate-200 bg-white p-2">
+          <QRCodeCanvas value={verificationUrl} size={108} includeMargin />
+        </div>
+      </article>
+    </section>
   )
 }
 
@@ -195,7 +354,6 @@ function DashboardPage({ auth, onLogout }) {
   const token = auth.token
   const [form, setForm] = useState(EMPTY_FORM)
   const [issueError, setIssueError] = useState('')
-  const [created, setCreated] = useState(null)
   const [documents, setDocuments] = useState([])
   const [logs, setLogs] = useState([])
   const [platforms, setPlatforms] = useState([])
@@ -203,16 +361,26 @@ function DashboardPage({ auth, onLogout }) {
   const [verifyId, setVerifyId] = useState('')
   const [verifyResult, setVerifyResult] = useState(null)
   const [verifyError, setVerifyError] = useState('')
+  const [selectedDocId, setSelectedDocId] = useState('')
 
-  const verificationUrl = useMemo(() => {
-    if (!created?.document_id) return ''
-    return `${window.location.origin}/verify/${created.document_id}`
-  }, [created])
+  const selectedDoc = useMemo(
+    () => documents.find((doc) => doc.id === selectedDocId) || documents[0] || null,
+    [documents, selectedDocId],
+  )
+
+  const selectedVerificationUrl = useMemo(() => {
+    if (!selectedDoc) return ''
+    return `${window.location.origin}/verify/${selectedDoc.id}`
+  }, [selectedDoc])
 
   const loadDocuments = async () => {
     const { ok, data } = await apiFetch('/api/documents', token)
     if (ok) {
-      setDocuments(data.documents || [])
+      const docs = data.documents || []
+      setDocuments(docs)
+      if (!selectedDocId && docs.length > 0) {
+        setSelectedDocId(docs[0].id)
+      }
     }
   }
 
@@ -267,11 +435,11 @@ function DashboardPage({ auth, onLogout }) {
       return
     }
 
-    setCreated(data)
     setForm(EMPTY_FORM)
-    loadDocuments()
-    loadLogs()
-    setActivePanel('overview')
+    setActivePanel('certificates')
+    setSelectedDocId(data.document_id)
+    await loadDocuments()
+    await loadLogs()
   }
 
   const handleVerify = async (e) => {
@@ -297,19 +465,32 @@ function DashboardPage({ auth, onLogout }) {
 
   const panels = [
     { id: 'overview', label: 'Overview' },
-    { id: 'issue', label: 'Issue Document' },
-    { id: 'verify', label: 'Verify' },
+    { id: 'issue', label: 'Issue Certificate' },
+    { id: 'certificates', label: 'Certificate Studio' },
+    { id: 'verify', label: 'Verification' },
     { id: 'logs', label: 'Audit Logs' },
     { id: 'platforms', label: 'Platforms' },
   ]
 
   return (
     <main className="min-h-screen p-4 sm:p-6">
-      <div className="mx-auto grid w-full max-w-7xl gap-4 lg:grid-cols-[250px_1fr]">
+      <div className="mx-auto mb-4 flex w-full max-w-7xl items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3">
+        <div className="flex items-center gap-2">
+          <span className="brand-dot" />
+          <p className="text-sm font-medium text-slate-700">UBDVS Platform</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Link to="/scan" className="btn-secondary">Mobile Scanner</Link>
+          <button type="button" className="btn-secondary" onClick={onLogout}>Sign out</button>
+        </div>
+      </div>
+
+      <div className="mx-auto grid w-full max-w-7xl gap-4 lg:grid-cols-[260px_1fr]">
         <aside className="panel p-4">
           <p className="eyebrow">Issuer Workspace</p>
           <h2 className="mt-2 text-xl font-semibold text-slate-900">{auth.user.organization_name}</h2>
           <p className="mt-1 text-sm text-slate-600">{auth.user.email}</p>
+
           <nav className="mt-5 grid gap-2">
             {panels.map((panel) => (
               <button
@@ -322,28 +503,37 @@ function DashboardPage({ auth, onLogout }) {
               </button>
             ))}
           </nav>
-          <button type="button" className="btn-secondary mt-6 w-full" onClick={onLogout}>Sign out</button>
         </aside>
 
         <section className="space-y-4">
           <header className="panel p-6">
-            <p className="eyebrow">UBDVS Platform</p>
-            <h1 className="mt-2 text-3xl font-semibold text-slate-900">Certificate Verification Console</h1>
-            <p className="mt-2 text-slate-600">Structured console inspired by production certificate systems.</p>
+            <p className="eyebrow">Automated Document Verification</p>
+            <h1 className="mt-2 text-3xl font-semibold leading-tight text-slate-900 sm:text-4xl">
+              Fraud-resistant certificate issuance and verification
+            </h1>
+            <p className="mt-3 max-w-3xl text-slate-600">
+              Trusted flow for issuers: create records, generate QR, let public users verify from web or mobile scan.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <span className="logo-chip">Global reach</span>
+              <span className="logo-chip">Public validation</span>
+              <span className="logo-chip">Downloadable certificates</span>
+              <span className="logo-chip">Audit-ready logs</span>
+            </div>
           </header>
 
           {activePanel === 'overview' && (
             <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              <StatCard title="Documents" value={documents.length} detail="Org scoped records" />
-              <StatCard title="Verifications" value={logs.length} detail="Logged access checks" />
-              <StatCard title="Platforms" value={platforms.length} detail="Enabled modules" />
-              <StatCard title="Proof Type" value="SHA-256" detail="Integrity hash only" />
+              <StatCard title="Issued Certificates" value={documents.length} detail="Organization records" />
+              <StatCard title="Verification Events" value={logs.length} detail="Public and API checks" />
+              <StatCard title="Security Model" value="SHA-256" detail="Integrity proof per document" />
+              <StatCard title="Active Modules" value={platforms.length} detail="Issuer + verify + audit" />
             </section>
           )}
 
           {activePanel === 'issue' && (
             <form onSubmit={handleIssue} className="panel p-6">
-              <h2 className="text-2xl font-semibold text-slate-900">Issue New Certificate</h2>
+              <h2 className="section-title">Issue New Certificate</h2>
               <div className="mt-4 grid gap-3 md:grid-cols-2">
                 <input
                   required
@@ -356,14 +546,14 @@ function DashboardPage({ auth, onLogout }) {
                   required
                   value={form.document_name}
                   onChange={(e) => setForm({ ...form, document_name: e.target.value })}
-                  placeholder="Certificate name"
+                  placeholder="Certificate title"
                   className="field"
                 />
                 <input
                   required
                   value={form.document_type}
                   onChange={(e) => setForm({ ...form, document_type: e.target.value })}
-                  placeholder="Type (Degree, License, etc.)"
+                  placeholder="Type (Diploma, License, etc.)"
                   className="field"
                 />
                 <input
@@ -381,25 +571,36 @@ function DashboardPage({ auth, onLogout }) {
                 rows={5}
                 className="field mt-3 font-mono text-xs"
               />
-              {issueError && <p className="mt-2 text-sm text-red-700">{issueError}</p>}
-              <button className="btn mt-4" type="submit">Issue Document</button>
 
-              {created && (
-                <div className="panel mt-5 p-4">
-                  <h3 className="text-lg font-semibold text-slate-900">Issued Successfully</h3>
-                  <p className="mt-2 text-sm text-slate-700">ID: <span className="font-mono text-xs">{created.document_id}</span></p>
-                  <Link to={`/verify/${created.document_id}`} className="btn-link mt-1 inline-block">Open public page</Link>
-                  <div className="mt-3 inline-block rounded-lg border border-slate-200 bg-white p-3">
-                    <QRCodeCanvas value={verificationUrl} size={132} includeMargin />
-                  </div>
-                </div>
-              )}
+              {issueError && <p className="mt-3 text-sm text-red-700">{issueError}</p>}
+              <button className="btn mt-4" type="submit">Issue Certificate</button>
             </form>
+          )}
+
+          {activePanel === 'certificates' && (
+            <>
+              <section className="panel p-6">
+                <h2 className="section-title">Pick Certificate</h2>
+                <select
+                  className="field mt-3"
+                  value={selectedDoc?.id || ''}
+                  onChange={(e) => setSelectedDocId(e.target.value)}
+                >
+                  {documents.map((doc) => (
+                    <option key={doc.id} value={doc.id}>
+                      {doc.id} - {doc.document_name} ({doc.recipient_name})
+                    </option>
+                  ))}
+                </select>
+              </section>
+              <CertificatePanel selectedDoc={selectedDoc} verificationUrl={selectedVerificationUrl} />
+            </>
           )}
 
           {activePanel === 'verify' && (
             <section className="panel p-6">
-              <h2 className="text-2xl font-semibold text-slate-900">Verification Desk</h2>
+              <h2 className="section-title">Verification Desk</h2>
+              <p className="mt-2 text-sm text-slate-600">Check by document ID or use mobile QR scanner.</p>
               <form onSubmit={handleVerify} className="mt-4 flex flex-col gap-2 sm:flex-row">
                 <input
                   value={verifyId}
@@ -409,6 +610,7 @@ function DashboardPage({ auth, onLogout }) {
                 />
                 <button className="btn">Verify</button>
               </form>
+              <Link to="/scan" className="btn-secondary mt-3 inline-flex">Open Mobile Scanner</Link>
               {verifyError && <p className="mt-3 text-sm text-red-700">{verifyError}</p>}
               {verifyResult && <VerifyResult data={verifyResult} />}
             </section>
@@ -417,7 +619,7 @@ function DashboardPage({ auth, onLogout }) {
           {activePanel === 'logs' && (
             <section className="panel p-6">
               <div className="mb-3 flex items-center justify-between">
-                <h2 className="text-2xl font-semibold text-slate-900">Audit Logs</h2>
+                <h2 className="section-title">Audit Logs</h2>
                 <button type="button" className="btn-secondary" onClick={loadLogs}>Refresh</button>
               </div>
               <div className="overflow-x-auto">
@@ -460,7 +662,7 @@ function DashboardPage({ auth, onLogout }) {
 
           <section className="panel p-6">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-2xl font-semibold text-slate-900">Organization Documents</h2>
+              <h2 className="section-title">Organization Documents</h2>
               <button type="button" className="btn-secondary" onClick={loadDocuments}>Refresh</button>
             </div>
             <div className="overflow-x-auto">
@@ -472,7 +674,7 @@ function DashboardPage({ auth, onLogout }) {
                     <th className="py-2 pr-4">Recipient</th>
                     <th className="py-2 pr-4">Type</th>
                     <th className="py-2 pr-4">Date</th>
-                    <th className="py-2">Public</th>
+                    <th className="py-2">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -521,9 +723,88 @@ function VerifyPage() {
       <section className="panel mx-auto mt-4 w-full max-w-3xl p-6">
         <p className="eyebrow">Public Verification</p>
         <h1 className="mt-2 text-3xl font-semibold text-slate-900">Document {id}</h1>
-        <Link to="/" className="btn-link mt-2 inline-block">Back to platform</Link>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <Link to="/" className="btn-secondary">Back to platform</Link>
+          <Link to="/scan" className="btn-secondary">Scan another QR</Link>
+        </div>
         {error && <p className="mt-4 text-red-700">{error}</p>}
         {result && <VerifyResult data={result} />}
+      </section>
+    </main>
+  )
+}
+
+function MobileScannerPage() {
+  const [decoded, setDecoded] = useState('')
+  const [notice, setNotice] = useState('Camera opens when permission granted. Best on mobile browser.')
+  const scannerRef = useRef(null)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const scanner = new Html5QrcodeScanner(
+      'qr-reader',
+      {
+        fps: 10,
+        qrbox: { width: 220, height: 220 },
+      },
+      false,
+    )
+
+    scanner.render(
+      (decodedText) => {
+        setDecoded(decodedText)
+        setNotice('QR detected. Redirecting if it matches verification URL...')
+
+        let targetId = ''
+        try {
+          const parsed = new URL(decodedText)
+          const parts = parsed.pathname.split('/').filter(Boolean)
+          if (parts[0] === 'verify' && parts[1]) {
+            targetId = parts[1]
+          }
+        } catch {
+          const marker = '/verify/'
+          if (decodedText.includes(marker)) {
+            targetId = decodedText.split(marker)[1].split(/[?#]/)[0]
+          }
+        }
+
+        if (targetId) {
+          navigate(`/verify/${targetId}`)
+        }
+      },
+      () => {},
+    )
+
+    scannerRef.current = scanner
+
+    return () => {
+      if (scannerRef.current) {
+        scannerRef.current.clear().catch(() => {})
+      }
+    }
+  }, [navigate])
+
+  return (
+    <main className="min-h-screen p-4 sm:p-8">
+      <section className="panel mx-auto w-full max-w-3xl p-6">
+        <p className="eyebrow">Mobile Verification Scanner</p>
+        <h1 className="mt-2 text-3xl font-semibold text-slate-900">Scan certificate QR code</h1>
+        <p className="mt-2 text-sm text-slate-600">{notice}</p>
+
+        <div id="qr-reader" className="qr-frame mt-4" />
+
+        {decoded && (
+          <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
+            <p className="text-xs uppercase tracking-[0.12em] text-slate-500">Decoded value</p>
+            <p className="mt-1 break-all font-mono text-xs text-slate-700">{decoded}</p>
+          </div>
+        )}
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link to="/" className="btn-secondary">Back to platform</Link>
+          <Link to="/login" className="btn-secondary">Back to login</Link>
+        </div>
       </section>
     </main>
   )
@@ -571,6 +852,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/scan" element={<MobileScannerPage />} />
         <Route path="/verify/:id" element={<VerifyPage />} />
       </Routes>
     </BrowserRouter>

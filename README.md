@@ -12,6 +12,9 @@ Stack: React (Vite + Tailwind) + Flask.
 - Public verification by document ID
 - Public verification API by hash
 - QR code generated for verification URL
+- Mobile QR scanner page (`/scan`) for phone camera verification
+- Certificate studio with downloadable PDF certificate
+- Downloadable QR image for print and sharing
 - Verification attempts logged
 
 ## Project Structure
@@ -52,6 +55,13 @@ Vite proxy forwards `/api/*` to Flask.
 - `GET /api/verify/<document_id>` verify by ID
 - `GET /api/public/verify/<hash>` verify by hash
 - `GET /api/logs` read verification logs
+
+## Frontend Routes
+
+- `/login` issuer login/register
+- `/` issuer platform dashboard
+- `/scan` camera-based QR scanner
+- `/verify/:id` public verification page
 
 ## Demo Login
 
