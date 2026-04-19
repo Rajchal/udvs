@@ -217,10 +217,12 @@ function LoginPage({ onAuth }) {
               <div className="mini-panel">
                 <p className="eyebrow">Mobile verification</p>
                 <p className="mt-2 text-sm text-slate-600">Scan QR with phone camera and land on public verify page instantly.</p>
+                <img src="/art-03-mobile.svg" alt="Mobile verification illustration" className="mt-3 art-image art-image-small" />
               </div>
               <div className="mini-panel">
                 <p className="eyebrow">Downloadable output</p>
                 <p className="mt-2 text-sm text-slate-600">Issue certificate PDF and QR image for print or digital sharing.</p>
+                <img src="/art-07-download.svg" alt="Download illustration" className="mt-3 art-image art-image-small" />
               </div>
               <div className="mini-panel">
                 <p className="eyebrow">Brand mark</p>
@@ -244,11 +246,22 @@ function LoginPage({ onAuth }) {
           </div>
 
           <Link to="/scan" className="btn-secondary mt-6 inline-flex">Open Mobile Scanner</Link>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <div className="visual-card">
+              <img src="/art-01-seal.svg" alt="Seal illustration" className="art-image" />
+            </div>
+            <div className="visual-card">
+              <img src="/art-10-trust.svg" alt="Trust illustration" className="art-image" />
+            </div>
+          </div>
         </div>
 
         <form onSubmit={submit} className="panel p-7 sm:p-8">
           <p className="eyebrow">Issuer Access</p>
           <h2 className="mt-2 text-3xl font-semibold text-slate-900">Sign in to Platform</h2>
+          <div className="mt-4 visual-card">
+            <img src="/art-09-user.svg" alt="User access illustration" className="art-image" />
+          </div>
 
           <div className="mt-5 flex rounded-xl bg-slate-100 p-1">
             <button
@@ -562,56 +575,66 @@ function DashboardPage({ auth, onLogout }) {
                 <StatCard title="Security Model" value="SHA-256" detail="Integrity proof per document" />
                 <StatCard title="Active Modules" value={platforms.length} detail="Issuer + verify + audit" />
               </div>
-              <div className="visual-card">
-                <img src="/feature-download.svg" alt="Certificate download illustration" className="art-image" />
+              <div className="grid gap-4">
+                <div className="visual-card">
+                  <img src="/feature-download.svg" alt="Certificate download illustration" className="art-image" />
+                </div>
+                <div className="visual-card">
+                  <img src="/art-04-chart.svg" alt="Verification analytics illustration" className="art-image" />
+                </div>
               </div>
             </section>
           )}
 
           {activePanel === 'issue' && (
-            <form onSubmit={handleIssue} className="panel p-6">
-              <h2 className="section-title">Issue New Certificate</h2>
-              <div className="mt-4 grid gap-3 md:grid-cols-2">
-                <input
-                  required
-                  value={form.recipient_name}
-                  onChange={(e) => setForm({ ...form, recipient_name: e.target.value })}
-                  placeholder="Recipient name"
-                  className="field"
-                />
-                <input
-                  required
-                  value={form.document_name}
-                  onChange={(e) => setForm({ ...form, document_name: e.target.value })}
-                  placeholder="Certificate title"
-                  className="field"
-                />
-                <input
-                  required
-                  value={form.document_type}
-                  onChange={(e) => setForm({ ...form, document_type: e.target.value })}
-                  placeholder="Type (Diploma, License, etc.)"
-                  className="field"
-                />
-                <input
-                  required
-                  type="date"
-                  value={form.issue_date}
-                  onChange={(e) => setForm({ ...form, issue_date: e.target.value })}
-                  className="field"
-                />
+            <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+              <div className="visual-card">
+                <img src="/art-05-doc.svg" alt="Document illustration" className="art-image" />
               </div>
-              <textarea
-                value={form.metadata_text}
-                onChange={(e) => setForm({ ...form, metadata_text: e.target.value })}
-                placeholder="Metadata JSON"
-                rows={5}
-                className="field mt-3 font-mono text-xs"
-              />
+              <form onSubmit={handleIssue} className="panel p-6">
+                <h2 className="section-title">Issue New Certificate</h2>
+                <div className="mt-4 grid gap-3 md:grid-cols-2">
+                  <input
+                    required
+                    value={form.recipient_name}
+                    onChange={(e) => setForm({ ...form, recipient_name: e.target.value })}
+                    placeholder="Recipient name"
+                    className="field"
+                  />
+                  <input
+                    required
+                    value={form.document_name}
+                    onChange={(e) => setForm({ ...form, document_name: e.target.value })}
+                    placeholder="Certificate title"
+                    className="field"
+                  />
+                  <input
+                    required
+                    value={form.document_type}
+                    onChange={(e) => setForm({ ...form, document_type: e.target.value })}
+                    placeholder="Type (Diploma, License, etc.)"
+                    className="field"
+                  />
+                  <input
+                    required
+                    type="date"
+                    value={form.issue_date}
+                    onChange={(e) => setForm({ ...form, issue_date: e.target.value })}
+                    className="field"
+                  />
+                </div>
+                <textarea
+                  value={form.metadata_text}
+                  onChange={(e) => setForm({ ...form, metadata_text: e.target.value })}
+                  placeholder="Metadata JSON"
+                  rows={5}
+                  className="field mt-3 font-mono text-xs"
+                />
 
-              {issueError && <p className="mt-3 text-sm text-red-700">{issueError}</p>}
-              <button className="btn mt-4" type="submit">Issue Certificate</button>
-            </form>
+                {issueError && <p className="mt-3 text-sm text-red-700">{issueError}</p>}
+                <button className="btn mt-4" type="submit">Issue Certificate</button>
+              </form>
+            </section>
           )}
 
           {activePanel === 'certificates' && (
@@ -630,6 +653,11 @@ function DashboardPage({ auth, onLogout }) {
                   ))}
                 </select>
               </section>
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="visual-card"><img src="/art-02-stack.svg" alt="Document stack illustration" className="art-image" /></div>
+                <div className="visual-card"><img src="/art-06-qr.svg" alt="QR illustration" className="art-image" /></div>
+                <div className="visual-card"><img src="/art-07-download.svg" alt="Download illustration" className="art-image" /></div>
+              </div>
               <CertificatePanel selectedDoc={selectedDoc} verificationUrl={selectedVerificationUrl} />
             </>
           )}
@@ -652,8 +680,13 @@ function DashboardPage({ auth, onLogout }) {
                 {verifyError && <p className="mt-3 text-sm text-red-700">{verifyError}</p>}
                 {verifyResult && <VerifyResult data={verifyResult} />}
               </div>
-              <div className="visual-card">
-                <img src="/feature-qr.svg" alt="QR verification illustration" className="art-image" />
+              <div className="grid gap-4">
+                <div className="visual-card">
+                  <img src="/feature-qr.svg" alt="QR verification illustration" className="art-image" />
+                </div>
+                <div className="visual-card">
+                  <img src="/art-08-audit.svg" alt="Audit illustration" className="art-image" />
+                </div>
               </div>
             </section>
           )}
@@ -699,6 +732,9 @@ function DashboardPage({ auth, onLogout }) {
                   <p className="mt-3 text-xs uppercase tracking-[0.12em] text-emerald-700">{item.status}</p>
                 </article>
               ))}
+              <div className="visual-card"><img src="/art-09-user.svg" alt="User module illustration" className="art-image" /></div>
+              <div className="visual-card"><img src="/art-01-seal.svg" alt="Seal module illustration" className="art-image" /></div>
+              <div className="visual-card"><img src="/art-10-trust.svg" alt="Trust module illustration" className="art-image" /></div>
             </section>
           )}
 
@@ -848,8 +884,13 @@ function MobileScannerPage() {
           </div>
           <div id="qr-reader" className="qr-frame" />
         </div>
-        <div className="mt-4 visual-card">
-          <img src="/feature-flow.svg" alt="Verification workflow illustration" className="art-image" />
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <div className="visual-card">
+            <img src="/art-03-mobile.svg" alt="Mobile illustration" className="art-image" />
+          </div>
+          <div className="visual-card">
+            <img src="/art-06-qr.svg" alt="QR illustration" className="art-image" />
+          </div>
         </div>
 
         {decoded && (

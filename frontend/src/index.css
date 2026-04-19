@@ -88,6 +88,19 @@ body {
   padding: 1rem;
 }
 
+.image-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.image-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.image-grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .field {
   width: 100%;
   border-radius: 0.8rem;
@@ -200,5 +213,10 @@ body {
 @media (max-width: 640px) {
   .visual-card-tight {
     max-width: none;
+  }
+
+  .image-grid-2,
+  .image-grid-3 {
+    grid-template-columns: 1fr;
   }
 }
