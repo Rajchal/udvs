@@ -164,6 +164,7 @@ function VerifyResult({ data }) {
 }
 
 function LoginPage({ onAuth }) {
+  const navigate = useNavigate()
   const [mode, setMode] = useState('login')
   const [organizationName, setOrganizationName] = useState('')
   const [email, setEmail] = useState('admin@acme.edu')
@@ -192,78 +193,39 @@ function LoginPage({ onAuth }) {
     }
 
     onAuth({ token: data.token, user: data.user })
+    navigate('/dashboard')
   }
 
   return (
     <main className="min-h-screen p-4 sm:p-8">
-      <section className="mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+      <section className="mx-auto grid w-full max-w-5xl gap-6 lg:grid-cols-[1fr_0.9fr]">
         <div className="panel overflow-hidden p-8 sm:p-10">
           <div className="flex items-center gap-2">
-            <img src="/ubdvs-logo.svg" alt="UBDVS logo" className="h-11 w-11 rounded-2xl border border-slate-200 bg-white" />
-            <p className="eyebrow">Universal Blockchain Document Verification System</p>
+            <img src="/ubdvs-logo.svg" alt="UBDVS logo" className="h-10 w-10 rounded-2xl border border-slate-200 bg-white" />
+            <div>
+              <p className="eyebrow">UBDVS</p>
+              <h1 className="text-2xl font-semibold text-slate-900">Simple sign in</h1>
+            </div>
           </div>
-          <h1 className="mt-4 text-4xl font-semibold leading-tight text-slate-900 sm:text-5xl">
-            Global-grade Certificate Verification Experience
-          </h1>
-          <p className="mt-5 max-w-2xl text-slate-600">
-            Automated issuance, QR verification, mobile scanning, and downloadable certificates in one platform.
+          <p className="mt-4 max-w-xl text-sm text-slate-600">
+            Login to issue certificates, generate QR, and verify documents.
           </p>
 
-          <div className="mt-7 grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-            <div className="visual-card">
-              <img src="/hero-doc-visual.svg" alt="Certificate and verification workspace illustration" className="art-image" />
-            </div>
-            <div className="grid gap-4">
-              <div className="mini-panel">
-                <p className="eyebrow">Mobile verification</p>
-                <p className="mt-2 text-sm text-slate-600">Scan QR with phone camera and land on public verify page instantly.</p>
-                <img src="/art-03-mobile.svg" alt="Mobile verification illustration" className="mt-3 art-image art-image-small" />
-              </div>
-              <div className="mini-panel">
-                <p className="eyebrow">Downloadable output</p>
-                <p className="mt-2 text-sm text-slate-600">Issue certificate PDF and QR image for print or digital sharing.</p>
-                <img src="/art-07-download.svg" alt="Download illustration" className="mt-3 art-image art-image-small" />
-              </div>
-              <div className="mini-panel">
-                <p className="eyebrow">Brand mark</p>
-                <img src="/ubdvs-logo.svg" alt="UBDVS brand mark" className="mt-3 h-20 w-20 rounded-3xl border border-slate-200 bg-white p-2" />
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-7 flex flex-wrap gap-2">
-            <span className="logo-chip">Acme University</span>
-            <span className="logo-chip">Gov Cert Board</span>
-            <span className="logo-chip">Prime Skills Council</span>
-            <span className="logo-chip">National Registry</span>
-          </div>
-
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            <StatCard title="Fraud Blocking" value="Hash Protected" detail="Tamper checks on every verification" />
-            <StatCard title="Channels" value="Web + Mobile" detail="Scan QR from phone to verify instantly" />
-            <StatCard title="Automation" value="Instant Issuance" detail="Generate ID, hash, and QR in one action" />
-            <StatCard title="Demo Access" value="Ready" detail="admin@acme.edu / admin123" />
-          </div>
-
-          <Link to="/scan" className="btn-secondary mt-6 inline-flex">Open Mobile Scanner</Link>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <div className="visual-card">
-              <img src="/art-01-seal.svg" alt="Seal illustration" className="art-image" />
-            </div>
-            <div className="visual-card">
-              <img src="/art-10-trust.svg" alt="Trust illustration" className="art-image" />
-            </div>
+            <div className="visual-card"><img src="/art-09-user.svg" alt="Login illustration" className="art-image" /></div>
+            <div className="visual-card"><img src="/art-06-qr.svg" alt="QR illustration" className="art-image" /></div>
+          </div>
+
+          <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+            Demo: admin@acme.edu / admin123
           </div>
         </div>
 
         <form onSubmit={submit} className="panel p-7 sm:p-8">
           <p className="eyebrow">Issuer Access</p>
-          <h2 className="mt-2 text-3xl font-semibold text-slate-900">Sign in to Platform</h2>
-          <div className="mt-4 visual-card">
-            <img src="/art-09-user.svg" alt="User access illustration" className="art-image" />
-          </div>
+          <h2 className="mt-2 text-3xl font-semibold text-slate-900">Login</h2>
 
-          <div className="mt-5 flex rounded-xl bg-slate-100 p-1">
+          <div className="mt-4 flex rounded-xl bg-slate-100 p-1">
             <button
               type="button"
               className={`tab-button ${mode === 'login' ? 'tab-active' : ''}`}
@@ -310,7 +272,161 @@ function LoginPage({ onAuth }) {
 
           {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
           <button type="submit" className="btn mt-5 w-full">{mode === 'login' ? 'Sign In' : 'Create Organization'}</button>
+          <Link to="/" className="btn-secondary mt-3 inline-flex w-full justify-center">Back to landing</Link>
         </form>
+      </section>
+    </main>
+  )
+}
+
+function LandingPage() {
+  const peoplePhoto = 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1400&q=80'
+  const documentPhoto = 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1200&q=80'
+  const verificationPhoto = 'https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1200&q=80'
+  const meetingPhoto = 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80'
+
+  return (
+    <main className="landing-shell min-h-screen">
+      <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/90 backdrop-blur">
+        <nav className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-3">
+            <img src="/ubdvs-logo.svg" alt="UBDVS logo" className="h-10 w-10 rounded-2xl border border-slate-200 bg-white" />
+            <div>
+              <p className="eyebrow">UBDVS</p>
+              <p className="text-sm font-semibold text-slate-900">Document Trust Platform</p>
+            </div>
+          </div>
+          <div className="hidden items-center gap-6 md:flex">
+            <a href="#features" className="landing-nav-link">Features</a>
+            <a href="#workflow" className="landing-nav-link">Workflow</a>
+            <a href="#use-cases" className="landing-nav-link">Use cases</a>
+            <Link to="/scan" className="landing-nav-link">Scan QR</Link>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link to="/login" className="btn">Login</Link>
+          </div>
+        </nav>
+      </header>
+
+      <section className="mx-auto grid w-full max-w-6xl gap-6 px-4 pb-8 pt-10 sm:px-6 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="panel p-8 sm:p-10">
+          <p className="eyebrow">Professional certificate verification</p>
+          <h1 className="mt-4 text-4xl font-semibold leading-tight text-slate-900 sm:text-5xl">
+            Real-world document verification for schools, companies, and public agencies
+          </h1>
+          <p className="mt-4 max-w-2xl text-lg text-slate-600">
+            Issue official certificates, attach secure QR links, and let anyone verify authenticity in seconds.
+          </p>
+
+          <div className="mt-7 flex flex-wrap gap-2">
+            <span className="logo-chip">Identity-safe</span>
+            <span className="logo-chip">Public proof page</span>
+            <span className="logo-chip">QR + mobile scan</span>
+            <span className="logo-chip">PDF ready</span>
+          </div>
+
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link to="/login" className="btn">Start issuing</Link>
+            <Link to="/scan" className="btn-secondary">Verify with camera</Link>
+          </div>
+        </div>
+
+        <div className="grid gap-4">
+          <article className="photo-card photo-card-lg">
+            <img src={peoplePhoto} alt="Professionals reviewing certificate records" className="photo-image" />
+            <div className="photo-overlay">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/90">Trusted by operations teams</p>
+              <p className="mt-1 text-lg font-semibold text-white">Live credential checks before approval</p>
+            </div>
+          </article>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <article className="photo-card">
+              <img src={documentPhoto} alt="Official document on desk" className="photo-image" />
+            </article>
+            <article className="photo-card">
+              <img src={verificationPhoto} alt="Person using mobile for verification" className="photo-image" />
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="features" className="mx-auto w-full max-w-6xl px-4 pb-6 sm:px-6">
+        <div className="grid gap-4 md:grid-cols-3">
+          <article className="panel p-6">
+            <p className="eyebrow">Issue</p>
+            <h3 className="mt-2 text-xl font-semibold text-slate-900">Create certificate records</h3>
+            <p className="mt-2 text-sm text-slate-600">Issuer teams generate records with secure IDs and immutable hash references.</p>
+          </article>
+          <article className="panel p-6">
+            <p className="eyebrow">Secure</p>
+            <h3 className="mt-2 text-xl font-semibold text-slate-900">Attach QR and share publicly</h3>
+            <p className="mt-2 text-sm text-slate-600">Every certificate includes a QR path for immediate authenticity checks.</p>
+          </article>
+          <article className="panel p-6">
+            <p className="eyebrow">Verify</p>
+            <h3 className="mt-2 text-xl font-semibold text-slate-900">Instant verification status</h3>
+            <p className="mt-2 text-sm text-slate-600">Employers and institutions validate records with a phone or direct link.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="workflow" className="mx-auto grid w-full max-w-6xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[0.95fr_1.05fr]">
+        <article className="photo-card photo-card-lg">
+          <img src={meetingPhoto} alt="Team validating records in an office" className="photo-image" />
+          <div className="photo-overlay">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/90">Workflow</p>
+            <p className="mt-1 text-lg font-semibold text-white">One platform from issuance to public proof</p>
+          </div>
+        </article>
+
+        <div className="panel p-7">
+          <p className="eyebrow">How it works</p>
+          <div className="mt-4 space-y-4">
+            <div className="mini-panel">
+              <p className="font-semibold text-slate-900">1. Organization signs in</p>
+              <p className="mt-1 text-sm text-slate-600">Authorized staff create and manage official records in dashboard.</p>
+            </div>
+            <div className="mini-panel">
+              <p className="font-semibold text-slate-900">2. Certificate is issued</p>
+              <p className="mt-1 text-sm text-slate-600">Platform generates certificate ID, hash, QR, and downloadable PDF.</p>
+            </div>
+            <div className="mini-panel">
+              <p className="font-semibold text-slate-900">3. Anyone can verify</p>
+              <p className="mt-1 text-sm text-slate-600">Scan the QR from mobile or open verification URL to confirm status.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="use-cases" className="mx-auto w-full max-w-6xl px-4 pb-12 sm:px-6">
+        <div className="panel p-7 sm:p-8">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="eyebrow">Use cases</p>
+              <h2 className="mt-2 text-3xl font-semibold text-slate-900">Built for real verification teams</h2>
+            </div>
+            <Link to="/login" className="btn">Open issuer dashboard</Link>
+          </div>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mini-panel">
+              <p className="font-semibold text-slate-900">Universities</p>
+              <p className="mt-1 text-sm text-slate-600">Degree and transcript authentication.</p>
+            </div>
+            <div className="mini-panel">
+              <p className="font-semibold text-slate-900">Corporate HR</p>
+              <p className="mt-1 text-sm text-slate-600">Pre-hire credential verification.</p>
+            </div>
+            <div className="mini-panel">
+              <p className="font-semibold text-slate-900">Government desks</p>
+              <p className="mt-1 text-sm text-slate-600">Citizen-facing document checks.</p>
+            </div>
+            <div className="mini-panel">
+              <p className="font-semibold text-slate-900">Training centers</p>
+              <p className="mt-1 text-sm text-slate-600">Fast issuance with public trust.</p>
+            </div>
+          </div>
+        </div>
       </section>
     </main>
   )
@@ -942,9 +1058,10 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={auth.token ? <Navigate to="/" replace /> : <LoginPage onAuth={handleAuth} />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={auth.token ? <Navigate to="/dashboard" replace /> : <LoginPage onAuth={handleAuth} />} />
         <Route
-          path="/"
+          path="/dashboard"
           element={
             <ProtectedRoute auth={auth}>
               <DashboardPage auth={auth} onLogout={logout} />
@@ -953,6 +1070,7 @@ function App() {
         />
         <Route path="/scan" element={<MobileScannerPage />} />
         <Route path="/verify/:id" element={<VerifyPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   )

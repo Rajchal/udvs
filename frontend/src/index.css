@@ -15,6 +15,13 @@ body {
   color: #0f172a;
 }
 
+.landing-shell {
+  background:
+    radial-gradient(1200px 500px at 90% -5%, rgba(14, 116, 144, 0.12), transparent 52%),
+    radial-gradient(800px 380px at -10% 35%, rgba(30, 64, 175, 0.08), transparent 55%),
+    #f4f7fb;
+}
+
 #root {
   min-height: 100vh;
 }
@@ -51,6 +58,18 @@ body {
   font-weight: 600;
 }
 
+.landing-nav-link {
+  color: #334155;
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 600;
+  transition: color 140ms ease;
+}
+
+.landing-nav-link:hover {
+  color: #0f172a;
+}
+
 .section-title {
   margin: 0;
   font-size: 1.45rem;
@@ -63,6 +82,33 @@ body {
   border: 1px solid #dbe3ee;
   border-radius: 1rem;
   background: #f8fbff;
+}
+
+.photo-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #dbe3ee;
+  border-radius: 1rem;
+  min-height: 190px;
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+}
+
+.photo-card-lg {
+  min-height: 320px;
+}
+
+.photo-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.photo-overlay {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 1rem;
+  background: linear-gradient(to top, rgba(15, 23, 42, 0.86), rgba(15, 23, 42, 0.1));
 }
 
 .visual-card-tight {
@@ -213,6 +259,10 @@ body {
 @media (max-width: 640px) {
   .visual-card-tight {
     max-width: none;
+  }
+
+  .photo-card-lg {
+    min-height: 240px;
   }
 
   .image-grid-2,
