@@ -433,20 +433,16 @@ function LandingPage() {
         </div>
 
         <div className="grid gap-4">
-          <article className="photo-card photo-card-lg">
-            <img src={heroTeamPhoto} alt="Professionals reviewing certificate records" className="photo-image" />
-            <div className="photo-overlay">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/90">Trusted by operations teams</p>
-              <p className="mt-1 text-lg font-semibold text-white">Live credential checks before approval</p>
-            </div>
-          </article>
+          <PhotoFrame
+            sources={heroTeamSources}
+            alt="Professionals reviewing certificate records"
+            className="photo-card-lg"
+            badge="Trusted by operations teams"
+            overlay="Live credential checks before approval"
+          />
           <div className="grid gap-4 sm:grid-cols-2">
-            <article className="photo-card">
-              <img src={docDeskPhoto} alt="Official certificate on desk" className="photo-image" />
-            </article>
-            <article className="photo-card">
-              <img src={mobileCheckPhoto} alt="Person using mobile phone for verification" className="photo-image" />
-            </article>
+            <PhotoFrame sources={docDeskSources} alt="Official certificate on desk" badge="Document detail" />
+            <PhotoFrame sources={mobileCheckSources} alt="Person using mobile phone for verification" badge="Mobile proof" />
           </div>
         </div>
       </section>
@@ -472,15 +468,15 @@ function LandingPage() {
       </section>
 
       <section id="workflow" className="mx-auto grid w-full max-w-6xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[0.95fr_1.05fr]">
-        <article className="photo-card photo-card-lg">
-          <img src={meetingPhoto} alt="Team validating records in an office" className="photo-image" />
-          <div className="photo-overlay">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/90">Workflow</p>
-            <p className="mt-1 text-lg font-semibold text-white">One platform from issuance to public proof</p>
-          </div>
-        </article>
+        <PhotoFrame
+          sources={meetingSources}
+          alt="Team validating records in an office"
+          className="photo-card-lg"
+          badge="Workflow"
+          overlay="One platform from issuance to public proof"
+        />
 
-        <div className="panel p-7">
+        <div className="panel panel-soft p-7">
           <p className="eyebrow">How it works</p>
           <div className="mt-4 space-y-4">
             <div className="mini-panel">
@@ -501,31 +497,28 @@ function LandingPage() {
 
       <section id="stories" className="mx-auto w-full max-w-6xl px-4 pb-8 sm:px-6">
         <div className="grid gap-4 lg:grid-cols-3">
-          <article className="photo-card">
-            <img src={recruiterPhoto} alt="Hiring team validating candidate records" className="photo-image" />
-            <div className="photo-overlay">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/90">Corporate HR</p>
-              <p className="mt-1 text-base font-semibold text-white">Offer approvals with instant credential checks</p>
-            </div>
-          </article>
-          <article className="photo-card">
-            <img src={gradPhoto} alt="Graduate with certificate" className="photo-image" />
-            <div className="photo-overlay">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/90">Education</p>
-              <p className="mt-1 text-base font-semibold text-white">Students share QR-backed certificates with confidence</p>
-            </div>
-          </article>
-          <article className="photo-card">
-            <img src={supportPhoto} alt="Verification support specialist" className="photo-image" />
-            <div className="photo-overlay">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/90">Verification desk</p>
-              <p className="mt-1 text-base font-semibold text-white">Support teams resolve authenticity requests quickly</p>
-            </div>
-          </article>
+          <PhotoFrame
+            sources={recruiterSources}
+            alt="Hiring team validating candidate records"
+            badge="Corporate HR"
+            overlay="Offer approvals with instant credential checks"
+          />
+          <PhotoFrame
+            sources={gradSources}
+            alt="Graduate with certificate"
+            badge="Education"
+            overlay="Students share QR-backed certificates with confidence"
+          />
+          <PhotoFrame
+            sources={supportSources}
+            alt="Verification support specialist"
+            badge="Verification desk"
+            overlay="Support teams resolve authenticity requests quickly"
+          />
         </div>
 
         <div className="mt-4 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-          <article className="panel p-6">
+          <article className="panel panel-soft p-6">
             <p className="eyebrow">Why teams choose UBDVS</p>
             <h3 className="mt-2 text-2xl font-semibold text-slate-900">Purpose-built for trust-sensitive workflows</h3>
             <p className="mt-3 text-sm text-slate-600">
@@ -543,18 +536,18 @@ function LandingPage() {
             </div>
           </article>
 
-          <article className="photo-card photo-card-lg">
-            <img src={officePhoto} alt="Operations room reviewing document dashboard" className="photo-image" />
-            <div className="photo-overlay">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/90">Operations</p>
-              <p className="mt-1 text-base font-semibold text-white">Issue, track, and verify in one interface</p>
-            </div>
-          </article>
+          <PhotoFrame
+            sources={officeSources}
+            alt="Operations room reviewing document dashboard"
+            className="photo-card-lg"
+            badge="Operations"
+            overlay="Issue, track, and verify in one interface"
+          />
         </div>
       </section>
 
       <section id="use-cases" className="mx-auto w-full max-w-6xl px-4 pb-12 sm:px-6">
-        <div className="panel p-7 sm:p-8">
+        <div className="panel panel-soft p-7 sm:p-8">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="eyebrow">Use cases</p>
@@ -571,19 +564,19 @@ function LandingPage() {
           </div>
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="mini-panel">
+            <div className="mini-panel mini-panel-accent">
               <p className="font-semibold text-slate-900">Universities</p>
               <p className="mt-1 text-sm text-slate-600">Degree and transcript authentication.</p>
             </div>
-            <div className="mini-panel">
+            <div className="mini-panel mini-panel-accent">
               <p className="font-semibold text-slate-900">Corporate HR</p>
               <p className="mt-1 text-sm text-slate-600">Pre-hire credential verification.</p>
             </div>
-            <div className="mini-panel">
+            <div className="mini-panel mini-panel-accent">
               <p className="font-semibold text-slate-900">Government desks</p>
               <p className="mt-1 text-sm text-slate-600">Citizen-facing document checks.</p>
             </div>
-            <div className="mini-panel">
+            <div className="mini-panel mini-panel-accent">
               <p className="font-semibold text-slate-900">Training centers</p>
               <p className="mt-1 text-sm text-slate-600">Fast issuance with public trust.</p>
             </div>
@@ -593,74 +586,76 @@ function LandingPage() {
     </main>
   )
 }
-          <PhotoFrame
-            sources={heroTeamSources}
-            alt="Professionals reviewing certificate records"
-            className="photo-card-lg"
-            badge="Trusted by operations teams"
-            overlay="Live credential checks before approval"
-          />
+
+function CertificatePanel({ selectedDoc, verificationUrl }) {
+  const [busy, setBusy] = useState(false)
+
+  if (!selectedDoc) {
+    return (
+      <section className="panel p-6">
         <h3 className="section-title">Certificate Studio</h3>
+        <p className="mt-2 text-sm text-slate-600">Issue document first, then certificate preview appears here.</p>
+      </section>
     )
   }
 
-const onPdf = async () => {
-  setBusy(true)
-  await downloadCertificatePdf(selectedDoc, verificationUrl)
-  setBusy(false)
-}
+  const onPdf = async () => {
+    setBusy(true)
+    await downloadCertificatePdf(selectedDoc, verificationUrl)
+    setBusy(false)
+  }
 
-const onQr = async () => {
-  await downloadQrImage(selectedDoc.id, verificationUrl)
-}
+  const onQr = async () => {
+    await downloadQrImage(selectedDoc.id, verificationUrl)
+  }
 
-return (
-  <section className="panel p-6">
-    <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-      <h3 className="section-title">Certificate Studio</h3>
-      <div className="flex gap-2">
-        <button type="button" className="btn-secondary" onClick={onQr}>Download QR</button>
-        <button type="button" className="btn" onClick={onPdf} disabled={busy}>
-          {busy ? 'Generating PDF...' : 'Download Certificate PDF'}
-        </button>
-      </div>
-    </div>
-
-    <article className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-      <div className="certificate-surface">
-        <p className="eyebrow">Certificate of Verification</p>
-        <h4 className="mt-2 text-3xl font-semibold text-slate-900">{selectedDoc.recipient_name}</h4>
-        <p className="mt-3 text-slate-600">
-          {selectedDoc.document_name} issued by {selectedDoc.organization_name}
-        </p>
-        <dl className="mt-6 grid gap-2 text-sm text-slate-700 sm:grid-cols-2">
-          <div>
-            <dt className="text-slate-500">Document ID</dt>
-            <dd className="font-mono text-xs">{selectedDoc.id}</dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">Type</dt>
-            <dd>{selectedDoc.document_type}</dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">Issue Date</dt>
-            <dd>{selectedDoc.issue_date}</dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">Hash</dt>
-            <dd className="font-mono text-xs break-all">{selectedDoc.hash}</dd>
-          </div>
-        </dl>
-        <div className="mt-6 inline-block rounded-md border border-slate-200 bg-white p-2">
-          <QRCodeCanvas value={verificationUrl} size={108} includeMargin />
+  return (
+    <section className="panel p-6">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <h3 className="section-title">Certificate Studio</h3>
+        <div className="flex gap-2">
+          <button type="button" className="btn-secondary" onClick={onQr}>Download QR</button>
+          <button type="button" className="btn" onClick={onPdf} disabled={busy}>
+            {busy ? 'Generating PDF...' : 'Download Certificate PDF'}
+          </button>
         </div>
       </div>
-      <div className="visual-card">
-        <img src="/feature-download.svg" alt="Certificate download preview" className="art-image" />
-      </div>
-    </article>
-  </section>
-)
+
+      <article className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="certificate-surface">
+          <p className="eyebrow">Certificate of Verification</p>
+          <h4 className="mt-2 text-3xl font-semibold text-slate-900">{selectedDoc.recipient_name}</h4>
+          <p className="mt-3 text-slate-600">
+            {selectedDoc.document_name} issued by {selectedDoc.organization_name}
+          </p>
+          <dl className="mt-6 grid gap-2 text-sm text-slate-700 sm:grid-cols-2">
+            <div>
+              <dt className="text-slate-500">Document ID</dt>
+              <dd className="font-mono text-xs">{selectedDoc.id}</dd>
+            </div>
+            <div>
+              <dt className="text-slate-500">Type</dt>
+              <dd>{selectedDoc.document_type}</dd>
+            </div>
+            <div>
+              <dt className="text-slate-500">Issue Date</dt>
+              <dd>{selectedDoc.issue_date}</dd>
+            </div>
+            <div>
+              <dt className="text-slate-500">Hash</dt>
+              <dd className="font-mono text-xs break-all">{selectedDoc.hash}</dd>
+            </div>
+          </dl>
+          <div className="mt-6 inline-block rounded-md border border-slate-200 bg-white p-2">
+            <QRCodeCanvas value={verificationUrl} size={108} includeMargin />
+          </div>
+        </div>
+        <div className="visual-card">
+          <img src="/feature-download.svg" alt="Certificate download preview" className="art-image" />
+        </div>
+      </article>
+    </section>
+  )
 }
 
 function DashboardPage({ auth, onLogout }) {
