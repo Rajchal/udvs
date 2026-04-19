@@ -3,6 +3,7 @@ import { jsPDF } from 'jspdf'
 import { Html5QrcodeScanner } from 'html5-qrcode'
 import QRCode from 'qrcode'
 import { QRCodeCanvas } from 'qrcode.react'
+import { Icon } from '@iconify/react'
 import { BrowserRouter, Link, Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom'
 
 const EMPTY_FORM = {
@@ -172,6 +173,18 @@ function PhotoFrame({ sources, alt, className = '', overlay, badge }) {
   )
 }
 
+function BrandMark() {
+  return (
+    <div className="brand-mark" aria-hidden="true">
+      <Icon icon="mdi:shield-star-outline" width="24" height="24" />
+    </div>
+  )
+}
+
+function InlineIcon({ icon, className = '' }) {
+  return <Icon icon={icon} className={className} aria-hidden="true" />
+}
+
 function VerifyResult({ data }) {
   const valid = data?.status === 'valid'
   return (
@@ -218,6 +231,16 @@ function LoginPage({ onAuth }) {
   const [email, setEmail] = useState('admin@acme.edu')
   const [password, setPassword] = useState('admin123')
   const [error, setError] = useState('')
+  const loginHeroSources = [
+    'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1400&q=80',
+    '/hero-doc-visual.svg',
+  ]
+  const loginSecondarySources = [
+    'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1521791055366-0d553872125f?auto=format&fit=crop&w=1200&q=80',
+    '/certificate-visual.svg',
+  ]
 
   const submit = async (e) => {
     e.preventDefault()
@@ -245,40 +268,75 @@ function LoginPage({ onAuth }) {
   }
 
   return (
-    <main className="min-h-screen p-4 sm:p-8">
-      <section className="mx-auto grid w-full max-w-5xl gap-6 lg:grid-cols-[1fr_0.9fr]">
-        <div className="panel overflow-hidden p-8 sm:p-10">
+    <main className="auth-shell min-h-screen p-4 sm:p-8">
+      <section className="mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="panel auth-hero-panel overflow-hidden p-8 sm:p-10">
           <div className="flex items-center gap-2">
-            <img src="/ubdvs-logo.svg" alt="UBDVS logo" className="h-10 w-10 rounded-2xl border border-slate-200 bg-white" />
+            <BrandMark />
             <div>
               <p className="eyebrow">UBDVS</p>
-              <h1 className="text-2xl font-semibold text-slate-900">Simple sign in</h1>
+              <h1 className="text-2xl font-semibold text-slate-900">Access the issuer console</h1>
             </div>
           </div>
           <p className="mt-4 max-w-xl text-sm text-slate-600">
-            Login to issue certificates, generate QR, and verify documents.
+            Login or register to issue certificates, manage QR verification, and keep the public proof page in sync.
           </p>
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <div className="visual-card"><img src="/art-09-user.svg" alt="Login illustration" className="art-image" /></div>
-            <div className="visual-card"><img src="/art-06-qr.svg" alt="QR illustration" className="art-image" /></div>
+            <PhotoFrame
+              sources={loginHeroSources}
+              alt="Team reviewing credentials"
+              badge="Issuer workflow"
+              overlay="Real people reviewing verified records"
+            />
+            <PhotoFrame
+              sources={loginSecondarySources}
+              alt="Team sharing certificates"
+              badge="Verification"
+              overlay="Documents, QR, and trust in one place"
+            />
           </div>
 
-          <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            <div className="auth-mini-card">
+              <InlineIcon icon="mdi:account-lock-outline" className="icon-card-icon" />
+              <div>
+                <p className="auth-mini-title">Secure access</p>
+                <p className="auth-mini-copy">Role-based login for issuers.</p>
+              </div>
+            </div>
+            <div className="auth-mini-card">
+              <InlineIcon icon="mdi:qrcode-scan" className="icon-card-icon" />
+              <div>
+                <p className="auth-mini-title">Instant verification</p>
+                <p className="auth-mini-copy">Scan QR from any phone.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 rounded-2xl border border-slate-200 bg-white/80 p-4 text-sm text-slate-600 shadow-sm">
             Demo: admin@acme.edu / admin123
           </div>
         </div>
 
-        <form onSubmit={submit} className="panel p-7 sm:p-8">
-          <p className="eyebrow">Issuer Access</p>
-          <h2 className="mt-2 text-3xl font-semibold text-slate-900">Login</h2>
+        <form onSubmit={submit} className="panel auth-form-panel p-7 sm:p-8">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="eyebrow">Issuer Access</p>
+              <h2 className="mt-2 text-3xl font-semibold text-slate-900">{mode === 'login' ? 'Login' : 'Create account'}</h2>
+            </div>
+            <div className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-600">
+              Secure portal
+            </div>
+          </div>
 
-          <div className="mt-4 flex rounded-xl bg-slate-100 p-1">
+          <div className="mt-4 flex rounded-2xl bg-slate-100 p-1">
             <button
               type="button"
               className={`tab-button ${mode === 'login' ? 'tab-active' : ''}`}
               onClick={() => setMode('login')}
             >
+              <InlineIcon icon="mdi:login-variant" className="btn-icon" />
               Login
             </button>
             <button
@@ -286,6 +344,7 @@ function LoginPage({ onAuth }) {
               className={`tab-button ${mode === 'register' ? 'tab-active' : ''}`}
               onClick={() => setMode('register')}
             >
+              <InlineIcon icon="mdi:account-plus-outline" className="btn-icon" />
               Register
             </button>
           </div>
@@ -319,8 +378,14 @@ function LoginPage({ onAuth }) {
           </div>
 
           {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
-          <button type="submit" className="btn mt-5 w-full">{mode === 'login' ? 'Sign In' : 'Create Organization'}</button>
-          <Link to="/" className="btn-secondary mt-3 inline-flex w-full justify-center">Back to landing</Link>
+          <button type="submit" className="btn auth-submit mt-5 w-full">
+            <InlineIcon icon={mode === 'login' ? 'mdi:login-variant' : 'mdi:account-plus-outline'} className="btn-icon" />
+            {mode === 'login' ? 'Sign in to dashboard' : 'Create organization'}
+          </button>
+          <Link to="/" className="btn-secondary auth-back mt-3 inline-flex w-full justify-center">
+            <InlineIcon icon="mdi:home-outline" className="btn-icon" />
+            Back to landing
+          </Link>
         </form>
       </section>
     </main>
@@ -374,21 +439,21 @@ function LandingPage() {
       <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/90 backdrop-blur">
         <nav className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-3">
-            <img src="/ubdvs-logo.svg" alt="UBDVS logo" className="h-10 w-10 rounded-2xl border border-slate-200 bg-white" />
+            <BrandMark />
             <div>
               <p className="eyebrow">UBDVS</p>
               <p className="text-sm font-semibold text-slate-900">Document Trust Platform</p>
             </div>
           </div>
           <div className="hidden items-center gap-6 md:flex">
-            <a href="#features" className="landing-nav-link">Features</a>
-            <a href="#workflow" className="landing-nav-link">Workflow</a>
-            <a href="#stories" className="landing-nav-link">Stories</a>
-            <a href="#use-cases" className="landing-nav-link">Use cases</a>
-            <Link to="/scan" className="landing-nav-link">Scan QR</Link>
+            <a href="#features" className="landing-nav-link"><InlineIcon icon="mdi:star-outline" className="nav-link-icon" />Features</a>
+            <a href="#workflow" className="landing-nav-link"><InlineIcon icon="mdi:timeline-clock-outline" className="nav-link-icon" />Workflow</a>
+            <a href="#stories" className="landing-nav-link"><InlineIcon icon="mdi:account-group-outline" className="nav-link-icon" />Stories</a>
+            <a href="#use-cases" className="landing-nav-link"><InlineIcon icon="mdi:briefcase-outline" className="nav-link-icon" />Use cases</a>
+            <Link to="/scan" className="landing-nav-link"><InlineIcon icon="mdi:qrcode-scan" className="nav-link-icon" />Scan QR</Link>
           </div>
           <div className="flex items-center gap-2">
-            <Link to="/login" className="btn">Login</Link>
+            <Link to="/login" className="btn"><InlineIcon icon="mdi:login-variant" className="btn-icon" />Login</Link>
           </div>
         </nav>
       </header>
@@ -404,28 +469,43 @@ function LandingPage() {
           </p>
 
           <div className="mt-7 flex flex-wrap gap-2">
-            <span className="logo-chip">Issuer login + roles</span>
-            <span className="logo-chip">Public proof link</span>
-            <span className="logo-chip">QR + mobile scan</span>
-            <span className="logo-chip">Downloadable PDF</span>
-            <span className="logo-chip">Audit-ready logs</span>
+            <span className="logo-chip"><InlineIcon icon="mdi:shield-lock-outline" className="chip-icon" />Issuer login + roles</span>
+            <span className="logo-chip"><InlineIcon icon="mdi:link-variant" className="chip-icon" />Public proof link</span>
+            <span className="logo-chip"><InlineIcon icon="mdi:qrcode-scan" className="chip-icon" />QR + mobile scan</span>
+            <span className="logo-chip"><InlineIcon icon="mdi:file-download-outline" className="chip-icon" />Downloadable PDF</span>
+            <span className="logo-chip"><InlineIcon icon="mdi:clipboard-text-clock-outline" className="chip-icon" />Audit-ready logs</span>
           </div>
 
           <div className="mt-7 flex flex-wrap gap-3">
-            <Link to="/login" className="btn">Start issuing</Link>
-            <Link to="/scan" className="btn-secondary">Verify with camera</Link>
+            <Link to="/login" className="btn"><InlineIcon icon="mdi:rocket-launch-outline" className="btn-icon" />Start issuing</Link>
+            <Link to="/scan" className="btn-secondary"><InlineIcon icon="mdi:camera-outline" className="btn-icon" />Verify with camera</Link>
+          </div>
+
+          <div className="mt-7 rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm">
+            <div className="flex flex-wrap items-center gap-3">
+              <InlineIcon icon="mdi:label-multiple-outline" className="section-icon" />
+              <p className="text-sm font-semibold text-slate-700">Trusted by teams that need simple verification, not heavy systems.</p>
+            </div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <div className="logo-strip-item"><InlineIcon icon="logos:google-icon" className="partner-logo" /><span>Institutions</span></div>
+              <div className="logo-strip-item"><InlineIcon icon="logos:microsoft-icon" className="partner-logo" /><span>Corporate</span></div>
+              <div className="logo-strip-item"><InlineIcon icon="logos:nextjs-icon" className="partner-logo" /><span>Modern teams</span></div>
+            </div>
           </div>
 
           <div className="mt-7 grid gap-3 sm:grid-cols-3">
             <div className="metric-pill">
+              <InlineIcon icon="mdi:timer-sand" className="metric-icon" />
               <p className="metric-value">10s</p>
               <p className="metric-label">Average verify time</p>
             </div>
             <div className="metric-pill">
+              <InlineIcon icon="mdi:shield-check-outline" className="metric-icon" />
               <p className="metric-value">QR + ID</p>
               <p className="metric-label">Dual verification path</p>
             </div>
             <div className="metric-pill">
+              <InlineIcon icon="mdi:clock-outline" className="metric-icon" />
               <p className="metric-value">24/7</p>
               <p className="metric-label">Public verification access</p>
             </div>
@@ -451,16 +531,19 @@ function LandingPage() {
         <div className="grid gap-4 md:grid-cols-3">
           <article className="panel p-6">
             <p className="eyebrow">Issue</p>
+            <InlineIcon icon="mdi:file-document-edit-outline" className="section-icon" />
             <h3 className="mt-2 text-xl font-semibold text-slate-900">Create certificate records</h3>
             <p className="mt-2 text-sm text-slate-600">Issuer teams generate records with secure IDs and immutable hash references.</p>
           </article>
           <article className="panel p-6">
             <p className="eyebrow">Secure</p>
+            <InlineIcon icon="mdi:shield-lock-outline" className="section-icon" />
             <h3 className="mt-2 text-xl font-semibold text-slate-900">Attach QR and share publicly</h3>
             <p className="mt-2 text-sm text-slate-600">Every certificate includes a QR path for immediate authenticity checks.</p>
           </article>
           <article className="panel p-6">
             <p className="eyebrow">Verify</p>
+            <InlineIcon icon="mdi:qrcode-scan" className="section-icon" />
             <h3 className="mt-2 text-xl font-semibold text-slate-900">Instant verification status</h3>
             <p className="mt-2 text-sm text-slate-600">Employers and institutions validate records with a phone or direct link.</p>
           </article>
@@ -580,6 +663,13 @@ function LandingPage() {
               <p className="font-semibold text-slate-900">Training centers</p>
               <p className="mt-1 text-sm text-slate-600">Fast issuance with public trust.</p>
             </div>
+          </div>
+
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="logo-strip-item"><InlineIcon icon="logos:google-cloud" className="partner-logo" /><span>Cloud ready</span></div>
+            <div className="logo-strip-item"><InlineIcon icon="logos:slack-icon" className="partner-logo" /><span>Team friendly</span></div>
+            <div className="logo-strip-item"><InlineIcon icon="logos:figma" className="partner-logo" /><span>Design clean</span></div>
+            <div className="logo-strip-item"><InlineIcon icon="logos:nextjs-icon" className="partner-logo" /><span>Next logo style</span></div>
           </div>
         </div>
       </section>
@@ -795,12 +885,12 @@ function DashboardPage({ auth, onLogout }) {
     <main className="min-h-screen p-4 sm:p-6">
       <div className="mx-auto mb-4 flex w-full max-w-7xl items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3">
         <div className="flex items-center gap-2">
-          <img src="/ubdvs-logo.svg" alt="UBDVS logo" className="h-8 w-8 rounded-xl border border-slate-200 bg-white" />
+          <BrandMark />
           <p className="text-sm font-medium text-slate-700">UBDVS Platform</p>
         </div>
         <div className="flex items-center gap-2">
-          <Link to="/scan" className="btn-secondary">Mobile Scanner</Link>
-          <button type="button" className="btn-secondary" onClick={onLogout}>Sign out</button>
+          <Link to="/scan" className="btn-secondary"><InlineIcon icon="mdi:qrcode-scan" className="btn-icon" />Mobile Scanner</Link>
+          <button type="button" className="btn-secondary" onClick={onLogout}><InlineIcon icon="mdi:logout-variant" className="btn-icon" />Sign out</button>
         </div>
       </div>
 
