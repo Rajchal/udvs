@@ -1,6 +1,15 @@
 @import 'tailwindcss';
 
 :root {
+  --c-ink: #0f172a;
+  --c-muted: #64748b;
+  --c-surface: #ffffff;
+  --c-line: #dde5ef;
+  --c-primary: #7c3aed;
+  --c-primary-dark: #5b21b6;
+  --c-secondary: #4f46e5;
+  --c-accent: #a855f7;
+  --c-sky: #4338ca;
   font-family: 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -11,15 +20,19 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: #f4f7fb;
-  color: #0f172a;
+  background:
+    radial-gradient(1200px 600px at 85% -10%, rgba(124, 58, 237, 0.17), transparent 55%),
+    radial-gradient(900px 450px at -10% 40%, rgba(79, 70, 229, 0.12), transparent 55%),
+    #f8f7ff;
+  color: var(--c-ink);
 }
 
 .landing-shell {
   background:
-    radial-gradient(1200px 500px at 90% -5%, rgba(14, 116, 144, 0.12), transparent 52%),
-    radial-gradient(800px 380px at -10% 35%, rgba(30, 64, 175, 0.08), transparent 55%),
-    #f4f7fb;
+    radial-gradient(1200px 500px at 90% -5%, rgba(124, 58, 237, 0.17), transparent 52%),
+    radial-gradient(700px 360px at 20% 100%, rgba(168, 85, 247, 0.14), transparent 55%),
+    radial-gradient(800px 380px at -10% 35%, rgba(79, 70, 229, 0.14), transparent 55%),
+    #f6f4ff;
 }
 
 #root {
@@ -27,10 +40,17 @@ body {
 }
 
 .panel {
-  border: 1px solid #dde5ef;
+  border: 1px solid var(--c-line);
   border-radius: 1rem;
-  background: #ffffff;
+  background: var(--c-surface);
   box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.panel:hover {
+  transform: translateY(-2px);
+  border-color: rgba(124, 58, 237, 0.38);
+  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.08);
 }
 
 .eyebrow {
@@ -38,7 +58,7 @@ body {
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.16em;
-  color: #64748b;
+  color: var(--c-muted);
 }
 
 .brand-dot {
@@ -56,6 +76,13 @@ body {
   padding: 0.34rem 0.72rem;
   font-size: 0.78rem;
   font-weight: 600;
+  transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease;
+}
+
+.logo-chip:hover {
+  transform: translateY(-1px);
+  border-color: rgba(124, 58, 237, 0.45);
+  background: #f6f0ff;
 }
 
 .landing-nav-link {
@@ -63,11 +90,27 @@ body {
   text-decoration: none;
   font-size: 0.92rem;
   font-weight: 600;
+  position: relative;
   transition: color 140ms ease;
 }
 
 .landing-nav-link:hover {
   color: #0f172a;
+}
+
+.landing-nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -5px;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--c-secondary), var(--c-accent));
+  transition: width 160ms ease;
+}
+
+.landing-nav-link:hover::after {
+  width: 100%;
 }
 
 .section-title {
@@ -81,7 +124,14 @@ body {
   overflow: hidden;
   border: 1px solid #dbe3ee;
   border-radius: 1rem;
-  background: #f8fbff;
+  background: #fbfaff;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.visual-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(124, 58, 237, 0.4);
+  box-shadow: 0 16px 30px rgba(124, 58, 237, 0.16);
 }
 
 .photo-card {
@@ -91,6 +141,7 @@ body {
   border-radius: 1rem;
   min-height: 190px;
   box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+  transition: transform 220ms ease, box-shadow 220ms ease;
 }
 
 .photo-card-lg {
@@ -102,6 +153,16 @@ body {
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 500ms ease;
+}
+
+.photo-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 22px 40px rgba(15, 23, 42, 0.16);
+}
+
+.photo-card:hover .photo-image {
+  transform: scale(1.04);
 }
 
 .photo-overlay {
@@ -109,6 +170,33 @@ body {
   inset: auto 0 0 0;
   padding: 1rem;
   background: linear-gradient(to top, rgba(15, 23, 42, 0.86), rgba(15, 23, 42, 0.1));
+}
+
+.metric-pill {
+  border: 1px solid #d9cdf8;
+  border-radius: 0.9rem;
+  background: linear-gradient(140deg, rgba(245, 243, 255, 0.95), rgba(237, 233, 254, 0.9));
+  padding: 0.85rem;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.metric-pill:hover {
+  transform: translateY(-2px);
+  border-color: rgba(124, 58, 237, 0.5);
+  box-shadow: 0 14px 22px rgba(124, 58, 237, 0.12);
+}
+
+.metric-value {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #5b21b6;
+}
+
+.metric-label {
+  margin: 0.2rem 0 0;
+  font-size: 0.78rem;
+  color: #4b5563;
 }
 
 .visual-card-tight {
@@ -132,6 +220,13 @@ body {
   border-radius: 0.9rem;
   background: #f8fafc;
   padding: 1rem;
+  transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease;
+}
+
+.mini-panel:hover {
+  transform: translateY(-2px);
+  border-color: rgba(124, 58, 237, 0.42);
+  background: #f5f3ff;
 }
 
 .image-grid {
@@ -159,41 +254,54 @@ body {
 }
 
 .field:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.16);
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+}
+
+.field:hover {
+  border-color: #a78bfa;
 }
 
 .btn {
   border: 0;
   border-radius: 0.8rem;
-  background: #0f172a;
+  background: linear-gradient(135deg, var(--c-primary-dark), var(--c-secondary));
   color: #f8fafc;
   padding: 0.65rem 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 140ms ease;
+  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
 }
 
 .btn:hover {
-  background: #1e293b;
+  transform: translateY(-1px);
+  box-shadow: 0 14px 22px rgba(91, 33, 182, 0.35);
+  filter: saturate(1.06);
 }
 
 .btn-secondary {
-  border: 1px solid #cbd5e1;
+  border: 1px solid #ddd6fe;
   border-radius: 0.75rem;
-  background: #ffffff;
-  color: #0f172a;
+  background: #f5f3ff;
+  color: #4c1d95;
   padding: 0.5rem 0.8rem;
   cursor: pointer;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
+  transition: transform 140ms ease, border-color 140ms ease, background-color 140ms ease;
+}
+
+.btn-secondary:hover {
+  transform: translateY(-1px);
+  border-color: #a78bfa;
+  background: #ede9fe;
 }
 
 .btn-link {
   border: 0;
   background: transparent;
-  color: #2563eb;
+  color: #5b21b6;
   text-decoration: underline;
   font-weight: 600;
   cursor: pointer;
@@ -209,6 +317,13 @@ body {
   padding: 0.5rem 0.8rem;
   font-weight: 600;
   cursor: pointer;
+  transition: background-color 140ms ease, color 140ms ease, transform 140ms ease;
+}
+
+.tab-button:hover {
+  color: #312e81;
+  background: #eef2ff;
+  transform: translateY(-1px);
 }
 
 .tab-active {
@@ -226,12 +341,19 @@ body {
   text-align: left;
   padding: 0.6rem 0.7rem;
   cursor: pointer;
+  transition: transform 120ms ease, border-color 120ms ease, background-color 120ms ease;
+}
+
+.nav-item:hover {
+  transform: translateX(2px);
+  border-color: #c4b5fd;
+  background: #f5f3ff;
 }
 
 .nav-item-active {
-  border-color: #93c5fd;
-  background: #eff6ff;
-  color: #1e3a8a;
+  border-color: #a78bfa;
+  background: #ede9fe;
+  color: #4c1d95;
 }
 
 .certificate-surface {
@@ -239,6 +361,14 @@ body {
   border-radius: 0.8rem;
   padding: 1.2rem;
   background: #fbfdff;
+}
+
+.panel table tbody tr {
+  transition: background-color 120ms ease;
+}
+
+.panel table tbody tr:hover {
+  background: #f5f3ff;
 }
 
 .qr-frame {

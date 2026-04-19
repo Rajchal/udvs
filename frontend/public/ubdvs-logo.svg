@@ -1,8 +1,21 @@
 <svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="160" height="160" rx="40" fill="#0F172A"/>
-  <rect x="28" y="28" width="104" height="104" rx="28" fill="#FFFFFF" opacity="0.08"/>
-  <path d="M80 28L110 40V68C110 90 97 108 80 132C63 108 50 90 50 68V40L80 28Z" fill="#FFFFFF"/>
-  <path d="M80 46L96 52V67C96 79 89 90 80 102C71 90 64 79 64 67V52L80 46Z" fill="#0F172A"/>
-  <circle cx="80" cy="66" r="7" fill="#FFFFFF"/>
-  <path d="M76 66L79 69L85 62" stroke="#0F172A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <defs>
+    <linearGradient id="bgGrad" x1="18" y1="18" x2="142" y2="142" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6D28D9"/>
+      <stop offset="0.52" stop-color="#4F46E5"/>
+      <stop offset="1" stop-color="#A855F7"/>
+    </linearGradient>
+    <linearGradient id="markGrad" x1="56" y1="48" x2="104" y2="112" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#EDE9FE"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="160" height="160" rx="40" fill="url(#bgGrad)"/>
+  <rect x="22" y="22" width="116" height="116" rx="30" fill="#FFFFFF" fill-opacity="0.13"/>
+
+  <path d="M54 112V48H66L94 86V48H106V112H94L66 74V112H54Z" fill="url(#markGrad)"/>
+  <circle cx="120" cy="44" r="9" fill="#FFFFFF" fill-opacity="0.95"/>
+  <path d="M116.5 44H123.5" stroke="#5B21B6" stroke-width="2.8" stroke-linecap="round"/>
+  <path d="M120 40.5V47.5" stroke="#5B21B6" stroke-width="2.8" stroke-linecap="round"/>
 </svg>

@@ -14,6 +14,28 @@ const EMPTY_FORM = {
 }
 
 const AUTH_KEY = 'ubdvs_auth'
+const PUBLIC_VERIFY_BASE_KEY = 'ubdvs_public_verify_base_url'
+
+function normalizeBaseUrl(value) {
+  const raw = (value || '').trim()
+  if (!raw) return ''
+  return raw.replace(/\/+$/, '')
+}
+
+function readPublicVerifyBaseUrl() {
+  const envBase = normalizeBaseUrl(import.meta.env.VITE_PUBLIC_VERIFY_BASE_URL || '')
+  try {
+    const stored = normalizeBaseUrl(localStorage.getItem(PUBLIC_VERIFY_BASE_KEY) || '')
+    return stored || envBase || window.location.origin
+  } catch {
+    return envBase || window.location.origin
+  }
+}
+
+function buildVerificationUrl(documentId, baseUrl) {
+  const base = normalizeBaseUrl(baseUrl) || window.location.origin
+  return `${base}/verify/${documentId}`
+}
 
 function readStoredAuth() {
   try {
@@ -280,10 +302,14 @@ function LoginPage({ onAuth }) {
 }
 
 function LandingPage() {
-  const peoplePhoto = 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1400&q=80'
-  const documentPhoto = 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1200&q=80'
-  const verificationPhoto = 'https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1200&q=80'
-  const meetingPhoto = 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80'
+  const heroTeamPhoto = 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80'
+  const docDeskPhoto = 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1300&q=80'
+  const mobileCheckPhoto = 'https://images.unsplash.com/photo-1586880244406-556ebe35f282?auto=format&fit=crop&w=1300&q=80'
+  const meetingPhoto = 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1300&q=80'
+  const recruiterPhoto = 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1300&q=80'
+  const gradPhoto = 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1300&q=80'
+  const officePhoto = 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1300&q=80'
+  const supportPhoto = 'https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?auto=format&fit=crop&w=1300&q=80'
 
   return (
     <main className="landing-shell min-h-screen">
@@ -299,6 +325,7 @@ function LandingPage() {
           <div className="hidden items-center gap-6 md:flex">
             <a href="#features" className="landing-nav-link">Features</a>
             <a href="#workflow" className="landing-nav-link">Workflow</a>
+            <a href="#stories" className="landing-nav-link">Stories</a>
             <a href="#use-cases" className="landing-nav-link">Use cases</a>
             <Link to="/scan" className="landing-nav-link">Scan QR</Link>
           </div>
@@ -312,28 +339,44 @@ function LandingPage() {
         <div className="panel p-8 sm:p-10">
           <p className="eyebrow">Professional certificate verification</p>
           <h1 className="mt-4 text-4xl font-semibold leading-tight text-slate-900 sm:text-5xl">
-            Real-world document verification for schools, companies, and public agencies
+            Real people. Real records. Real-time proof.
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-slate-600">
-            Issue official certificates, attach secure QR links, and let anyone verify authenticity in seconds.
+            UBDVS helps institutions issue trusted certificates and lets anyone verify authenticity in seconds from mobile.
           </p>
 
           <div className="mt-7 flex flex-wrap gap-2">
-            <span className="logo-chip">Identity-safe</span>
-            <span className="logo-chip">Public proof page</span>
+            <span className="logo-chip">Issuer login + roles</span>
+            <span className="logo-chip">Public proof link</span>
             <span className="logo-chip">QR + mobile scan</span>
-            <span className="logo-chip">PDF ready</span>
+            <span className="logo-chip">Downloadable PDF</span>
+            <span className="logo-chip">Audit-ready logs</span>
           </div>
 
           <div className="mt-7 flex flex-wrap gap-3">
             <Link to="/login" className="btn">Start issuing</Link>
             <Link to="/scan" className="btn-secondary">Verify with camera</Link>
           </div>
+
+          <div className="mt-7 grid gap-3 sm:grid-cols-3">
+            <div className="metric-pill">
+              <p className="metric-value">10s</p>
+              <p className="metric-label">Average verify time</p>
+            </div>
+            <div className="metric-pill">
+              <p className="metric-value">QR + ID</p>
+              <p className="metric-label">Dual verification path</p>
+            </div>
+            <div className="metric-pill">
+              <p className="metric-value">24/7</p>
+              <p className="metric-label">Public verification access</p>
+            </div>
+          </div>
         </div>
 
         <div className="grid gap-4">
           <article className="photo-card photo-card-lg">
-            <img src={peoplePhoto} alt="Professionals reviewing certificate records" className="photo-image" />
+            <img src={heroTeamPhoto} alt="Professionals reviewing certificate records" className="photo-image" />
             <div className="photo-overlay">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/90">Trusted by operations teams</p>
               <p className="mt-1 text-lg font-semibold text-white">Live credential checks before approval</p>
@@ -341,10 +384,10 @@ function LandingPage() {
           </article>
           <div className="grid gap-4 sm:grid-cols-2">
             <article className="photo-card">
-              <img src={documentPhoto} alt="Official document on desk" className="photo-image" />
+              <img src={docDeskPhoto} alt="Official certificate on desk" className="photo-image" />
             </article>
             <article className="photo-card">
-              <img src={verificationPhoto} alt="Person using mobile for verification" className="photo-image" />
+              <img src={mobileCheckPhoto} alt="Person using mobile phone for verification" className="photo-image" />
             </article>
           </div>
         </div>
@@ -398,6 +441,60 @@ function LandingPage() {
         </div>
       </section>
 
+      <section id="stories" className="mx-auto w-full max-w-6xl px-4 pb-8 sm:px-6">
+        <div className="grid gap-4 lg:grid-cols-3">
+          <article className="photo-card">
+            <img src={recruiterPhoto} alt="Hiring team validating candidate records" className="photo-image" />
+            <div className="photo-overlay">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/90">Corporate HR</p>
+              <p className="mt-1 text-base font-semibold text-white">Offer approvals with instant credential checks</p>
+            </div>
+          </article>
+          <article className="photo-card">
+            <img src={gradPhoto} alt="Graduate with certificate" className="photo-image" />
+            <div className="photo-overlay">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/90">Education</p>
+              <p className="mt-1 text-base font-semibold text-white">Students share QR-backed certificates with confidence</p>
+            </div>
+          </article>
+          <article className="photo-card">
+            <img src={supportPhoto} alt="Verification support specialist" className="photo-image" />
+            <div className="photo-overlay">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/90">Verification desk</p>
+              <p className="mt-1 text-base font-semibold text-white">Support teams resolve authenticity requests quickly</p>
+            </div>
+          </article>
+        </div>
+
+        <div className="mt-4 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+          <article className="panel p-6">
+            <p className="eyebrow">Why teams choose UBDVS</p>
+            <h3 className="mt-2 text-2xl font-semibold text-slate-900">Purpose-built for trust-sensitive workflows</h3>
+            <p className="mt-3 text-sm text-slate-600">
+              From admissions to hiring and licensing, your team gets a practical workflow with a public proof page and clear status result.
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <div className="mini-panel">
+                <p className="font-semibold text-slate-900">Single source of truth</p>
+                <p className="mt-1 text-sm text-slate-600">Each issued record carries a unique ID and secure hash.</p>
+              </div>
+              <div className="mini-panel">
+                <p className="font-semibold text-slate-900">Faster verifications</p>
+                <p className="mt-1 text-sm text-slate-600">Phone camera scan directs verifiers straight to result page.</p>
+              </div>
+            </div>
+          </article>
+
+          <article className="photo-card photo-card-lg">
+            <img src={officePhoto} alt="Operations room reviewing document dashboard" className="photo-image" />
+            <div className="photo-overlay">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/90">Operations</p>
+              <p className="mt-1 text-base font-semibold text-white">Issue, track, and verify in one interface</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
       <section id="use-cases" className="mx-auto w-full max-w-6xl px-4 pb-12 sm:px-6">
         <div className="panel p-7 sm:p-8">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -406,6 +503,13 @@ function LandingPage() {
               <h2 className="mt-2 text-3xl font-semibold text-slate-900">Built for real verification teams</h2>
             </div>
             <Link to="/login" className="btn">Open issuer dashboard</Link>
+          </div>
+
+          <div className="mt-4 rounded-xl border border-violet-200/70 bg-violet-50/70 p-4">
+            <p className="text-sm text-violet-900">
+              Hotspot mode tip: open Certificate Studio, set public verification base URL to your laptop hotspot IP
+              (for example http://192.168.43.1:5173), then regenerate QR.
+            </p>
           </div>
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -515,6 +619,7 @@ function DashboardPage({ auth, onLogout }) {
   const [verifyResult, setVerifyResult] = useState(null)
   const [verifyError, setVerifyError] = useState('')
   const [selectedDocId, setSelectedDocId] = useState('')
+  const [publicVerifyBaseUrl, setPublicVerifyBaseUrl] = useState(readPublicVerifyBaseUrl)
 
   const selectedDoc = useMemo(
     () => documents.find((doc) => doc.id === selectedDocId) || documents[0] || null,
@@ -523,8 +628,18 @@ function DashboardPage({ auth, onLogout }) {
 
   const selectedVerificationUrl = useMemo(() => {
     if (!selectedDoc) return ''
-    return `${window.location.origin}/verify/${selectedDoc.id}`
-  }, [selectedDoc])
+    return buildVerificationUrl(selectedDoc.id, publicVerifyBaseUrl)
+  }, [selectedDoc, publicVerifyBaseUrl])
+
+  useEffect(() => {
+    const normalized = normalizeBaseUrl(publicVerifyBaseUrl)
+    if (!normalized) return
+    try {
+      localStorage.setItem(PUBLIC_VERIFY_BASE_KEY, normalized)
+    } catch {
+      // ignore storage errors and keep in-memory value
+    }
+  }, [publicVerifyBaseUrl])
 
   const loadDocuments = async () => {
     const { ok, data } = await apiFetch('/api/documents', token)
@@ -768,6 +883,30 @@ function DashboardPage({ auth, onLogout }) {
                     </option>
                   ))}
                 </select>
+
+                <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <p className="eyebrow">Public verification base URL (for mobile QR)</p>
+                  <input
+                    className="field mt-2"
+                    placeholder="https://your-domain.com"
+                    value={publicVerifyBaseUrl}
+                    onChange={(e) => setPublicVerifyBaseUrl(e.target.value)}
+                  />
+                  <p className="mt-2 text-xs text-slate-600">
+                    If your laptop uses localhost, set this to your LAN IP origin like
+                    {' '}
+                    <span className="font-mono">http://192.168.x.x:5173</span>
+                    {' '}
+                    so phone-scanned QR links open correctly.
+                  </p>
+                  <button
+                    type="button"
+                    className="btn-link mt-2"
+                    onClick={() => setPublicVerifyBaseUrl(window.location.origin)}
+                  >
+                    Reset to current origin
+                  </button>
+                </div>
               </section>
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="visual-card"><img src="/art-02-stack.svg" alt="Document stack illustration" className="art-image" /></div>
