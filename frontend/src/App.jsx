@@ -57,9 +57,8 @@ function VerifyResult({ data }) {
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-xl font-semibold text-slate-900">Verification Result</h3>
         <span
-          className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] ${
-            valid ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
-          }`}
+          className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] ${valid ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
+            }`}
         >
           {valid ? 'Valid' : 'Invalid'}
         </span>
