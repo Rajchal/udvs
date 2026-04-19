@@ -58,6 +58,36 @@ body {
   color: #0f172a;
 }
 
+.visual-card {
+  overflow: hidden;
+  border: 1px solid #dbe3ee;
+  border-radius: 1rem;
+  background: #f8fbff;
+}
+
+.visual-card-tight {
+  max-width: 420px;
+}
+
+.art-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.art-image-small {
+  margin-top: 1rem;
+  border-radius: 0.9rem;
+  border: 1px solid #dbe3ee;
+}
+
+.mini-panel {
+  border: 1px solid #dbe3ee;
+  border-radius: 0.9rem;
+  background: #f8fafc;
+  padding: 1rem;
+}
+
 .field {
   width: 100%;
   border-radius: 0.8rem;
@@ -165,4 +195,10 @@ body {
 
 #qr-reader video {
   border-radius: 0.6rem;
+}
+
+@media (max-width: 640px) {
+  .visual-card-tight {
+    max-width: none;
+  }
 }

@@ -131,9 +131,8 @@ function VerifyResult({ data }) {
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-xl font-semibold text-slate-900">Verification Result</h3>
         <span
-          className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] ${
-            valid ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
-          }`}
+          className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] ${valid ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
+            }`}
         >
           {valid ? 'Valid' : 'Invalid'}
         </span>
@@ -198,9 +197,9 @@ function LoginPage({ onAuth }) {
   return (
     <main className="min-h-screen p-4 sm:p-8">
       <section className="mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-        <div className="panel p-8 sm:p-10">
+        <div className="panel overflow-hidden p-8 sm:p-10">
           <div className="flex items-center gap-2">
-            <span className="brand-dot" />
+            <img src="/ubdvs-logo.svg" alt="UBDVS logo" className="h-11 w-11 rounded-2xl border border-slate-200 bg-white" />
             <p className="eyebrow">Universal Blockchain Document Verification System</p>
           </div>
           <h1 className="mt-4 text-4xl font-semibold leading-tight text-slate-900 sm:text-5xl">
@@ -209,6 +208,26 @@ function LoginPage({ onAuth }) {
           <p className="mt-5 max-w-2xl text-slate-600">
             Automated issuance, QR verification, mobile scanning, and downloadable certificates in one platform.
           </p>
+
+          <div className="mt-7 grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
+            <div className="visual-card">
+              <img src="/hero-doc-visual.svg" alt="Certificate and verification workspace illustration" className="art-image" />
+            </div>
+            <div className="grid gap-4">
+              <div className="mini-panel">
+                <p className="eyebrow">Mobile verification</p>
+                <p className="mt-2 text-sm text-slate-600">Scan QR with phone camera and land on public verify page instantly.</p>
+              </div>
+              <div className="mini-panel">
+                <p className="eyebrow">Downloadable output</p>
+                <p className="mt-2 text-sm text-slate-600">Issue certificate PDF and QR image for print or digital sharing.</p>
+              </div>
+              <div className="mini-panel">
+                <p className="eyebrow">Brand mark</p>
+                <img src="/ubdvs-logo.svg" alt="UBDVS brand mark" className="mt-3 h-20 w-20 rounded-3xl border border-slate-200 bg-white p-2" />
+              </div>
+            </div>
+          </div>
 
           <div className="mt-7 flex flex-wrap gap-2">
             <span className="logo-chip">Acme University</span>
@@ -318,32 +337,37 @@ function CertificatePanel({ selectedDoc, verificationUrl }) {
         </div>
       </div>
 
-      <article className="certificate-surface">
-        <p className="eyebrow">Certificate of Verification</p>
-        <h4 className="mt-2 text-3xl font-semibold text-slate-900">{selectedDoc.recipient_name}</h4>
-        <p className="mt-3 text-slate-600">
-          {selectedDoc.document_name} issued by {selectedDoc.organization_name}
-        </p>
-        <dl className="mt-6 grid gap-2 text-sm text-slate-700 sm:grid-cols-2">
-          <div>
-            <dt className="text-slate-500">Document ID</dt>
-            <dd className="font-mono text-xs">{selectedDoc.id}</dd>
+      <article className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="certificate-surface">
+          <p className="eyebrow">Certificate of Verification</p>
+          <h4 className="mt-2 text-3xl font-semibold text-slate-900">{selectedDoc.recipient_name}</h4>
+          <p className="mt-3 text-slate-600">
+            {selectedDoc.document_name} issued by {selectedDoc.organization_name}
+          </p>
+          <dl className="mt-6 grid gap-2 text-sm text-slate-700 sm:grid-cols-2">
+            <div>
+              <dt className="text-slate-500">Document ID</dt>
+              <dd className="font-mono text-xs">{selectedDoc.id}</dd>
+            </div>
+            <div>
+              <dt className="text-slate-500">Type</dt>
+              <dd>{selectedDoc.document_type}</dd>
+            </div>
+            <div>
+              <dt className="text-slate-500">Issue Date</dt>
+              <dd>{selectedDoc.issue_date}</dd>
+            </div>
+            <div>
+              <dt className="text-slate-500">Hash</dt>
+              <dd className="font-mono text-xs break-all">{selectedDoc.hash}</dd>
+            </div>
+          </dl>
+          <div className="mt-6 inline-block rounded-md border border-slate-200 bg-white p-2">
+            <QRCodeCanvas value={verificationUrl} size={108} includeMargin />
           </div>
-          <div>
-            <dt className="text-slate-500">Type</dt>
-            <dd>{selectedDoc.document_type}</dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">Issue Date</dt>
-            <dd>{selectedDoc.issue_date}</dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">Hash</dt>
-            <dd className="font-mono text-xs break-all">{selectedDoc.hash}</dd>
-          </div>
-        </dl>
-        <div className="mt-6 inline-block rounded-md border border-slate-200 bg-white p-2">
-          <QRCodeCanvas value={verificationUrl} size={108} includeMargin />
+        </div>
+        <div className="visual-card">
+          <img src="/feature-download.svg" alt="Certificate download preview" className="art-image" />
         </div>
       </article>
     </section>
@@ -476,7 +500,7 @@ function DashboardPage({ auth, onLogout }) {
     <main className="min-h-screen p-4 sm:p-6">
       <div className="mx-auto mb-4 flex w-full max-w-7xl items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3">
         <div className="flex items-center gap-2">
-          <span className="brand-dot" />
+          <img src="/ubdvs-logo.svg" alt="UBDVS logo" className="h-8 w-8 rounded-xl border border-slate-200 bg-white" />
           <p className="text-sm font-medium text-slate-700">UBDVS Platform</p>
         </div>
         <div className="flex items-center gap-2">
@@ -490,6 +514,7 @@ function DashboardPage({ auth, onLogout }) {
           <p className="eyebrow">Issuer Workspace</p>
           <h2 className="mt-2 text-xl font-semibold text-slate-900">{auth.user.organization_name}</h2>
           <p className="mt-1 text-sm text-slate-600">{auth.user.email}</p>
+          <img src="/feature-shield.svg" alt="Security illustration" className="mt-4 art-image art-image-small" />
 
           <nav className="mt-5 grid gap-2">
             {panels.map((panel) => (
@@ -508,26 +533,38 @@ function DashboardPage({ auth, onLogout }) {
         <section className="space-y-4">
           <header className="panel p-6">
             <p className="eyebrow">Automated Document Verification</p>
-            <h1 className="mt-2 text-3xl font-semibold leading-tight text-slate-900 sm:text-4xl">
-              Fraud-resistant certificate issuance and verification
-            </h1>
-            <p className="mt-3 max-w-3xl text-slate-600">
-              Trusted flow for issuers: create records, generate QR, let public users verify from web or mobile scan.
-            </p>
-            <div className="mt-5 flex flex-wrap gap-2">
-              <span className="logo-chip">Global reach</span>
-              <span className="logo-chip">Public validation</span>
-              <span className="logo-chip">Downloadable certificates</span>
-              <span className="logo-chip">Audit-ready logs</span>
+            <div className="mt-4 grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+              <div>
+                <h1 className="text-3xl font-semibold leading-tight text-slate-900 sm:text-4xl">
+                  Fraud-resistant certificate issuance and verification
+                </h1>
+                <p className="mt-3 max-w-3xl text-slate-600">
+                  Trusted flow for issuers: create records, generate QR, let public users verify from web or mobile scan.
+                </p>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  <span className="logo-chip">Global reach</span>
+                  <span className="logo-chip">Public validation</span>
+                  <span className="logo-chip">Downloadable certificates</span>
+                  <span className="logo-chip">Audit-ready logs</span>
+                </div>
+              </div>
+              <div className="visual-card visual-card-tight">
+                <img src="/feature-flow.svg" alt="Issuance workflow illustration" className="art-image" />
+              </div>
             </div>
           </header>
 
           {activePanel === 'overview' && (
-            <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              <StatCard title="Issued Certificates" value={documents.length} detail="Organization records" />
-              <StatCard title="Verification Events" value={logs.length} detail="Public and API checks" />
-              <StatCard title="Security Model" value="SHA-256" detail="Integrity proof per document" />
-              <StatCard title="Active Modules" value={platforms.length} detail="Issuer + verify + audit" />
+            <section className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-2">
+                <StatCard title="Issued Certificates" value={documents.length} detail="Organization records" />
+                <StatCard title="Verification Events" value={logs.length} detail="Public and API checks" />
+                <StatCard title="Security Model" value="SHA-256" detail="Integrity proof per document" />
+                <StatCard title="Active Modules" value={platforms.length} detail="Issuer + verify + audit" />
+              </div>
+              <div className="visual-card">
+                <img src="/feature-download.svg" alt="Certificate download illustration" className="art-image" />
+              </div>
             </section>
           )}
 
@@ -598,21 +635,26 @@ function DashboardPage({ auth, onLogout }) {
           )}
 
           {activePanel === 'verify' && (
-            <section className="panel p-6">
-              <h2 className="section-title">Verification Desk</h2>
-              <p className="mt-2 text-sm text-slate-600">Check by document ID or use mobile QR scanner.</p>
-              <form onSubmit={handleVerify} className="mt-4 flex flex-col gap-2 sm:flex-row">
-                <input
-                  value={verifyId}
-                  onChange={(e) => setVerifyId(e.target.value)}
-                  placeholder="Document ID"
-                  className="field"
-                />
-                <button className="btn">Verify</button>
-              </form>
-              <Link to="/scan" className="btn-secondary mt-3 inline-flex">Open Mobile Scanner</Link>
-              {verifyError && <p className="mt-3 text-sm text-red-700">{verifyError}</p>}
-              {verifyResult && <VerifyResult data={verifyResult} />}
+            <section className="grid gap-4 lg:grid-cols-[1fr_0.9fr]">
+              <div className="panel p-6">
+                <h2 className="section-title">Verification Desk</h2>
+                <p className="mt-2 text-sm text-slate-600">Check by document ID or use mobile QR scanner.</p>
+                <form onSubmit={handleVerify} className="mt-4 flex flex-col gap-2 sm:flex-row">
+                  <input
+                    value={verifyId}
+                    onChange={(e) => setVerifyId(e.target.value)}
+                    placeholder="Document ID"
+                    className="field"
+                  />
+                  <button className="btn">Verify</button>
+                </form>
+                <Link to="/scan" className="btn-secondary mt-3 inline-flex">Open Mobile Scanner</Link>
+                {verifyError && <p className="mt-3 text-sm text-red-700">{verifyError}</p>}
+                {verifyResult && <VerifyResult data={verifyResult} />}
+              </div>
+              <div className="visual-card">
+                <img src="/feature-qr.svg" alt="QR verification illustration" className="art-image" />
+              </div>
             </section>
           )}
 
@@ -727,6 +769,14 @@ function VerifyPage() {
           <Link to="/" className="btn-secondary">Back to platform</Link>
           <Link to="/scan" className="btn-secondary">Scan another QR</Link>
         </div>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <div className="visual-card">
+            <img src="/feature-shield.svg" alt="Verification security illustration" className="art-image" />
+          </div>
+          <div className="visual-card">
+            <img src="/feature-qr.svg" alt="QR verification illustration" className="art-image" />
+          </div>
+        </div>
         {error && <p className="mt-4 text-red-700">{error}</p>}
         {result && <VerifyResult data={result} />}
       </section>
@@ -773,14 +823,14 @@ function MobileScannerPage() {
           navigate(`/verify/${targetId}`)
         }
       },
-      () => {},
+      () => { },
     )
 
     scannerRef.current = scanner
 
     return () => {
       if (scannerRef.current) {
-        scannerRef.current.clear().catch(() => {})
+        scannerRef.current.clear().catch(() => { })
       }
     }
   }, [navigate])
@@ -792,7 +842,15 @@ function MobileScannerPage() {
         <h1 className="mt-2 text-3xl font-semibold text-slate-900">Scan certificate QR code</h1>
         <p className="mt-2 text-sm text-slate-600">{notice}</p>
 
-        <div id="qr-reader" className="qr-frame mt-4" />
+        <div className="mt-4 grid gap-4 lg:grid-cols-[0.92fr_1.08fr] lg:items-start">
+          <div className="visual-card">
+            <img src="/mobile-scan-visual.svg" alt="Mobile scanning illustration" className="art-image" />
+          </div>
+          <div id="qr-reader" className="qr-frame" />
+        </div>
+        <div className="mt-4 visual-card">
+          <img src="/feature-flow.svg" alt="Verification workflow illustration" className="art-image" />
+        </div>
 
         {decoded && (
           <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
