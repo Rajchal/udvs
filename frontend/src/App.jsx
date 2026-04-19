@@ -604,63 +604,63 @@ function LandingPage() {
     )
   }
 
-  const onPdf = async () => {
-    setBusy(true)
-    await downloadCertificatePdf(selectedDoc, verificationUrl)
-    setBusy(false)
-  }
+const onPdf = async () => {
+  setBusy(true)
+  await downloadCertificatePdf(selectedDoc, verificationUrl)
+  setBusy(false)
+}
 
-  const onQr = async () => {
-    await downloadQrImage(selectedDoc.id, verificationUrl)
-  }
+const onQr = async () => {
+  await downloadQrImage(selectedDoc.id, verificationUrl)
+}
 
-  return (
-    <section className="panel p-6">
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="section-title">Certificate Studio</h3>
-        <div className="flex gap-2">
-          <button type="button" className="btn-secondary" onClick={onQr}>Download QR</button>
-          <button type="button" className="btn" onClick={onPdf} disabled={busy}>
-            {busy ? 'Generating PDF...' : 'Download Certificate PDF'}
-          </button>
+return (
+  <section className="panel p-6">
+    <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+      <h3 className="section-title">Certificate Studio</h3>
+      <div className="flex gap-2">
+        <button type="button" className="btn-secondary" onClick={onQr}>Download QR</button>
+        <button type="button" className="btn" onClick={onPdf} disabled={busy}>
+          {busy ? 'Generating PDF...' : 'Download Certificate PDF'}
+        </button>
+      </div>
+    </div>
+
+    <article className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
+      <div className="certificate-surface">
+        <p className="eyebrow">Certificate of Verification</p>
+        <h4 className="mt-2 text-3xl font-semibold text-slate-900">{selectedDoc.recipient_name}</h4>
+        <p className="mt-3 text-slate-600">
+          {selectedDoc.document_name} issued by {selectedDoc.organization_name}
+        </p>
+        <dl className="mt-6 grid gap-2 text-sm text-slate-700 sm:grid-cols-2">
+          <div>
+            <dt className="text-slate-500">Document ID</dt>
+            <dd className="font-mono text-xs">{selectedDoc.id}</dd>
+          </div>
+          <div>
+            <dt className="text-slate-500">Type</dt>
+            <dd>{selectedDoc.document_type}</dd>
+          </div>
+          <div>
+            <dt className="text-slate-500">Issue Date</dt>
+            <dd>{selectedDoc.issue_date}</dd>
+          </div>
+          <div>
+            <dt className="text-slate-500">Hash</dt>
+            <dd className="font-mono text-xs break-all">{selectedDoc.hash}</dd>
+          </div>
+        </dl>
+        <div className="mt-6 inline-block rounded-md border border-slate-200 bg-white p-2">
+          <QRCodeCanvas value={verificationUrl} size={108} includeMargin />
         </div>
       </div>
-
-      <article className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-        <div className="certificate-surface">
-          <p className="eyebrow">Certificate of Verification</p>
-          <h4 className="mt-2 text-3xl font-semibold text-slate-900">{selectedDoc.recipient_name}</h4>
-          <p className="mt-3 text-slate-600">
-            {selectedDoc.document_name} issued by {selectedDoc.organization_name}
-          </p>
-          <dl className="mt-6 grid gap-2 text-sm text-slate-700 sm:grid-cols-2">
-            <div>
-              <dt className="text-slate-500">Document ID</dt>
-              <dd className="font-mono text-xs">{selectedDoc.id}</dd>
-            </div>
-            <div>
-              <dt className="text-slate-500">Type</dt>
-              <dd>{selectedDoc.document_type}</dd>
-            </div>
-            <div>
-              <dt className="text-slate-500">Issue Date</dt>
-              <dd>{selectedDoc.issue_date}</dd>
-            </div>
-            <div>
-              <dt className="text-slate-500">Hash</dt>
-              <dd className="font-mono text-xs break-all">{selectedDoc.hash}</dd>
-            </div>
-          </dl>
-          <div className="mt-6 inline-block rounded-md border border-slate-200 bg-white p-2">
-            <QRCodeCanvas value={verificationUrl} size={108} includeMargin />
-          </div>
-        </div>
-        <div className="visual-card">
-          <img src="/feature-download.svg" alt="Certificate download preview" className="art-image" />
-        </div>
-      </article>
-    </section>
-  )
+      <div className="visual-card">
+        <img src="/feature-download.svg" alt="Certificate download preview" className="art-image" />
+      </div>
+    </article>
+  </section>
+)
 }
 
 function DashboardPage({ auth, onLogout }) {
